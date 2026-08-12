@@ -1,0 +1,969 @@
+# Spanish translations for the School Administration ERP API.
+# Spanish is the project's default language (LANGUAGE_CODE = "es"), while source
+# strings are authored in English -- so this catalogue is what most users see.
+#
+# Regenerate the template with `manage.py makemessages -l es -l en` (needs GNU
+# gettext installed), then compile with `python scripts/compile_messages.py`.
+msgid ""
+msgstr ""
+"Project-Id-Version: school-admin-erp 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-12 00:02+0000\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/academic/apps.py:9 apps/core/modules.py:31
+msgid "Academic"
+msgstr "Académico"
+
+#: apps/academic/models.py:23 apps/academic/models.py:52
+#: apps/academic/models.py:68 apps/academic/models.py:120
+#: apps/academic/models.py:251 apps/academic/models.py:306
+#: apps/tenants/models.py:51
+msgid "name"
+msgstr "nombre"
+
+#: apps/academic/models.py:24 apps/academic/models.py:259
+msgid "start date"
+msgstr "fecha de inicio"
+
+#: apps/academic/models.py:25 apps/academic/models.py:260
+msgid "end date"
+msgstr "fecha de fin"
+
+#: apps/academic/models.py:29 apps/academic/models.py:264
+msgid "current"
+msgstr "actual"
+
+#: apps/academic/models.py:30
+msgid "Exactly one academic year should be current at a time."
+msgstr "Solo un año académico debe estar activo a la vez."
+
+# ---------------------------------------------------------------------------
+# Academic (apps/academic)
+# ---------------------------------------------------------------------------
+#: apps/academic/models.py:34 apps/academic/models.py:131
+#: apps/academic/models.py:195 apps/academic/models.py:249
+msgid "academic year"
+msgstr "año académico"
+
+#: apps/academic/models.py:35
+msgid "academic years"
+msgstr "años académicos"
+
+#: apps/academic/models.py:51 apps/academic/models.py:67
+msgid "code"
+msgstr "código"
+
+#: apps/academic/models.py:53 apps/academic/models.py:69
+#: apps/billing/models.py:127
+msgid "description"
+msgstr "descripción"
+
+#: apps/academic/models.py:56 apps/academic/models.py:80
+#: apps/academic/models.py:125 apps/academic/models.py:189
+msgid "programme"
+msgstr "programa"
+
+#: apps/academic/models.py:57
+msgid "programmes"
+msgstr "programas"
+
+#: apps/academic/models.py:73
+msgid "credits"
+msgstr "créditos"
+
+#: apps/academic/models.py:88
+msgid "teacher"
+msgstr "docente"
+
+#: apps/academic/models.py:92 apps/academic/models.py:298
+#: apps/academic/models.py:436
+msgid "subject"
+msgstr "asignatura"
+
+#: apps/academic/models.py:93
+msgid "subjects"
+msgstr "asignaturas"
+
+#: apps/academic/models.py:139
+msgid "tutor"
+msgstr "tutor"
+
+#: apps/academic/models.py:144
+msgid "home room"
+msgstr "aula habitual"
+
+#: apps/academic/models.py:145
+msgid "Where the group is by default. A timetable entry may override it."
+msgstr "Dónde está el grupo por defecto. Una clase del horario puede indicar otra."
+
+#: apps/academic/models.py:149 apps/academic/models.py:210
+#: apps/academic/models.py:430
+msgid "group"
+msgstr "grupo"
+
+#: apps/academic/models.py:150
+msgid "groups"
+msgstr "grupos"
+
+#: apps/academic/models.py:165
+msgid "Pending"
+msgstr "Pendiente"
+
+#: apps/academic/models.py:166
+msgid "Active"
+msgstr "Activa"
+
+#: apps/academic/models.py:167
+msgid "Withdrawn"
+msgstr "Retirada"
+
+#: apps/academic/models.py:168
+msgid "Completed"
+msgstr "Completada"
+
+#: apps/academic/models.py:183
+msgid "student"
+msgstr "estudiante"
+
+#: apps/academic/models.py:217 apps/academic/models.py:494
+#: apps/academic/models.py:559 apps/billing/models.py:80
+msgid "status"
+msgstr "estado"
+
+#: apps/academic/models.py:219
+msgid "enrolled on"
+msgstr "matriculado el"
+
+#: apps/academic/models.py:222 apps/academic/models.py:353
+#: apps/academic/models.py:552
+msgid "enrollment"
+msgstr "matrícula"
+
+#: apps/academic/models.py:223
+msgid "enrollments"
+msgstr "matrículas"
+
+#: apps/academic/models.py:256
+#, fuzzy
+#| msgid "description"
+msgid "position"
+msgstr "descripción"
+
+#: apps/academic/models.py:257
+msgid "Order within the year. Report cards are printed in this order."
+msgstr "Orden dentro del año. Las boletas se imprimen en este orden."
+
+#: apps/academic/models.py:265
+msgid "The period the gradebook opens on."
+msgstr "El periodo con el que abre la libreta."
+
+#: apps/academic/models.py:269 apps/academic/models.py:304
+msgid "evaluation period"
+msgstr "periodo de evaluación"
+
+#: apps/academic/models.py:270
+msgid "evaluation periods"
+msgstr "periodos de evaluación"
+
+#: apps/academic/models.py:312
+msgid "maximum score"
+msgstr "calificación máxima"
+
+#: apps/academic/models.py:319
+msgid "weight"
+msgstr "peso"
+
+#: apps/academic/models.py:320
+msgid "Relative to the other assessments in the same period."
+msgstr "Relativo a las demás evaluaciones del mismo periodo."
+
+#: apps/academic/models.py:322 apps/billing/models.py:84
+msgid "due date"
+msgstr "fecha de vencimiento"
+
+#: apps/academic/models.py:325 apps/academic/models.py:347
+msgid "assessment"
+msgstr "evaluación"
+
+#: apps/academic/models.py:326
+#, fuzzy
+#| msgid "payments"
+msgid "assessments"
+msgstr "pagos"
+
+#: apps/academic/models.py:359
+msgid "score"
+msgstr "calificación"
+
+#: apps/academic/models.py:361
+msgid "comment"
+msgstr "comentario"
+
+#: apps/academic/models.py:371 apps/billing/models.py:182
+msgid "recorded by"
+msgstr "registrado por"
+
+#: apps/academic/models.py:375
+msgid "grade"
+msgstr "calificación"
+
+#: apps/academic/models.py:376
+msgid "grades"
+msgstr "calificaciones"
+
+#: apps/academic/models.py:407
+msgid "Monday"
+msgstr "lunes"
+
+#: apps/academic/models.py:408
+msgid "Tuesday"
+msgstr "martes"
+
+#: apps/academic/models.py:409
+msgid "Wednesday"
+msgstr "miércoles"
+
+#: apps/academic/models.py:410
+msgid "Thursday"
+msgstr "jueves"
+
+#: apps/academic/models.py:411
+msgid "Friday"
+msgstr "viernes"
+
+#: apps/academic/models.py:412
+msgid "Saturday"
+msgstr "sábado"
+
+#: apps/academic/models.py:413
+msgid "Sunday"
+msgstr "domingo"
+
+#: apps/academic/models.py:441
+msgid "weekday"
+msgstr "día de la semana"
+
+#: apps/academic/models.py:443
+#, fuzzy
+#| msgid "start date"
+msgid "starts at"
+msgstr "fecha de inicio"
+
+#: apps/academic/models.py:444
+msgid "ends at"
+msgstr "termina a las"
+
+#: apps/academic/models.py:445
+msgid "room"
+msgstr "aula"
+
+#: apps/academic/models.py:448 apps/academic/models.py:487
+msgid "timetable entry"
+msgstr "clase del horario"
+
+#: apps/academic/models.py:449
+msgid "timetable entries"
+msgstr "clases del horario"
+
+#: apps/academic/models.py:467
+msgid "Held"
+msgstr "Impartida"
+
+#: apps/academic/models.py:468 apps/billing/models.py:37
+msgid "Cancelled"
+msgstr "Cancelada"
+
+#: apps/academic/models.py:489
+#, fuzzy
+#| msgid "end date"
+msgid "date"
+msgstr "fecha de fin"
+
+#: apps/academic/models.py:496 apps/academic/models.py:561
+#, fuzzy
+#| msgid "notes"
+msgid "note"
+msgstr "notas"
+
+#: apps/academic/models.py:503
+msgid "taken by"
+msgstr "pasada por"
+
+#: apps/academic/models.py:505
+msgid "taken at"
+msgstr "pasada el"
+
+#: apps/academic/models.py:508 apps/academic/models.py:546
+msgid "class session"
+msgstr "sesión de clase"
+
+#: apps/academic/models.py:509
+msgid "class sessions"
+msgstr "sesiones de clase"
+
+#: apps/academic/models.py:524
+msgid "Present"
+msgstr "Presente"
+
+#: apps/academic/models.py:525
+msgid "Late"
+msgstr "Retardo"
+
+#: apps/academic/models.py:526
+msgid "Absent"
+msgstr "Ausente"
+
+#: apps/academic/models.py:527
+msgid "Excused"
+msgstr "Justificada"
+
+#: apps/academic/models.py:564
+msgid "attendance record"
+msgstr "registro de asistencia"
+
+#: apps/academic/models.py:565
+msgid "attendance records"
+msgstr "registros de asistencia"
+
+#: apps/academic/serializers.py:44
+msgid "The end date must be after the start date."
+msgstr "La fecha de fin debe ser posterior a la fecha de inicio."
+
+#: apps/academic/serializers.py:182
+msgid "That group belongs to a different programme."
+msgstr "Ese grupo pertenece a otro programa."
+
+#: apps/academic/serializers.py:186
+msgid "That group belongs to a different academic year."
+msgstr "Ese grupo pertenece a otro año académico."
+
+#: apps/academic/serializers.py:220
+#, fuzzy
+#| msgid "The due date cannot precede the issue date."
+msgid "The end date cannot precede the start date."
+msgstr "La fecha de vencimiento no puede ser anterior a la fecha de emisión."
+
+#: apps/academic/serializers.py:235
+msgid "This year already has a period in that position."
+msgstr "Este año ya tiene un periodo en esa posición."
+
+#: apps/academic/serializers.py:358
+#, fuzzy
+#| msgid "The end date must be after the start date."
+msgid "The class must end after it starts."
+msgstr "La fecha de fin debe ser posterior a la fecha de inicio."
+
+#: apps/academic/serializers.py:366
+msgid "That subject is not taught in this group's programme."
+msgstr "Esa asignatura no se imparte en el programa de este grupo."
+
+#: apps/academic/timetable.py:86
+#, python-format
+msgid "%(group)s already has %(subject)s at that hour."
+msgstr "%(group)s ya tiene %(subject)s a esa hora."
+
+#: apps/academic/timetable.py:95
+#, python-format
+msgid "%(teacher)s is teaching %(group)s at that hour."
+msgstr "%(teacher)s ya tiene clase con %(group)s a esa hora."
+
+#: apps/academic/timetable.py:107
+#, python-format
+msgid "Room %(room)s is taken by %(group)s at that hour."
+msgstr "El aula %(room)s está ocupada por %(group)s a esa hora."
+
+#: apps/academic/views.py:391
+msgid "You can only take the roll for classes you teach."
+msgstr "Solo puedes pasar lista en las clases que impartes."
+
+#: apps/academic/views.py:465
+msgid "Use the format YYYY-MM-DD."
+msgstr "Usa el formato AAAA-MM-DD."
+
+#: apps/academic/views.py:486
+#, python-format
+msgid "That class does not meet on %(day)s."
+msgstr "Esa clase no se imparte el %(day)s."
+
+#: apps/authentication/apps.py:9
+msgid "Authentication"
+msgstr "Autenticación"
+
+#: apps/authentication/serializers.py:37
+msgid "No active account found with the given credentials."
+msgstr "No hay ninguna cuenta activa con esas credenciales."
+
+#: apps/authentication/serializers.py:171
+msgid "The token is invalid or has already expired."
+msgstr "El token no es válido o ya ha expirado."
+
+#: apps/authentication/views.py:93 apps/authentication/views.py:97
+msgid "This account belongs to a single school."
+msgstr "Esta cuenta pertenece a una sola escuela."
+
+#: apps/authentication/views.py:103
+#, fuzzy
+#| msgid "A user with this email already exists at this institution."
+msgid "You are not registered at this institution."
+msgstr "Ya existe un usuario con este correo en esta institución."
+
+#: apps/authentication/views.py:168
+msgid "No refresh token was provided."
+msgstr "No se proporcionó ningún token de renovación."
+
+#: apps/authentication/views.py:179
+msgid "The session has expired. Please sign in again."
+msgstr "La sesión ha expirado. Vuelve a iniciar sesión."
+
+#: apps/billing/apps.py:9 apps/core/modules.py:34
+msgid "Billing"
+msgstr "Facturación"
+
+#: apps/billing/models.py:32
+msgid "Draft"
+msgstr "Borrador"
+
+#: apps/billing/models.py:33
+msgid "Issued"
+msgstr "Emitida"
+
+#: apps/billing/models.py:34
+msgid "Partially paid"
+msgstr "Parcialmente pagada"
+
+#: apps/billing/models.py:35
+msgid "Paid"
+msgstr "Pagada"
+
+#: apps/billing/models.py:36
+msgid "Overdue"
+msgstr "Vencida"
+
+#: apps/billing/models.py:41
+msgid "Cash"
+msgstr "Efectivo"
+
+#: apps/billing/models.py:42
+msgid "Card"
+msgstr "Tarjeta"
+
+#: apps/billing/models.py:43
+msgid "Bank transfer"
+msgstr "Transferencia bancaria"
+
+#: apps/billing/models.py:44
+msgid "Cheque"
+msgstr "Cheque"
+
+#: apps/billing/models.py:48
+msgid "invoice number"
+msgstr "número de factura"
+
+#: apps/billing/models.py:53
+msgid "enrollment ID"
+msgstr "ID de matrícula"
+
+#: apps/billing/models.py:54
+msgid "Reference to apps.academic Enrollment. Resolved via services."
+msgstr ""
+"Referencia a la matrícula de apps.academic. Se resuelve mediante servicios."
+
+#: apps/billing/models.py:56
+msgid "student ID"
+msgstr "ID de estudiante"
+
+#: apps/billing/models.py:57
+msgid "programme ID"
+msgstr "ID de programa"
+
+#: apps/billing/models.py:60
+msgid "student name"
+msgstr "nombre del estudiante"
+
+#: apps/billing/models.py:62
+msgid "programme name"
+msgstr "nombre del programa"
+
+#: apps/billing/models.py:72
+msgid "issued by"
+msgstr "emitida por"
+
+#: apps/billing/models.py:82
+msgid "currency"
+msgstr "moneda"
+
+#: apps/billing/models.py:83
+msgid "issue date"
+msgstr "fecha de emisión"
+
+#: apps/billing/models.py:85
+msgid "notes"
+msgstr "notas"
+
+# ---------------------------------------------------------------------------
+# Billing (apps/billing)
+# ---------------------------------------------------------------------------
+#: apps/billing/models.py:88 apps/billing/models.py:123
+#: apps/billing/models.py:160
+msgid "invoice"
+msgstr "factura"
+
+#: apps/billing/models.py:89
+msgid "invoices"
+msgstr "facturas"
+
+#: apps/billing/models.py:126
+msgid "concept ID"
+msgstr "ID de concepto"
+
+#: apps/billing/models.py:133
+msgid "quantity"
+msgstr "cantidad"
+
+#: apps/billing/models.py:139
+msgid "unit price"
+msgstr "precio unitario"
+
+#: apps/billing/models.py:143
+msgid "invoice line"
+msgstr "línea de factura"
+
+#: apps/billing/models.py:144
+msgid "invoice lines"
+msgstr "líneas de factura"
+
+#: apps/billing/models.py:166
+msgid "amount"
+msgstr "importe"
+
+#: apps/billing/models.py:172
+msgid "method"
+msgstr "método"
+
+#: apps/billing/models.py:174
+msgid "reference"
+msgstr "referencia"
+
+#: apps/billing/models.py:175
+msgid "received on"
+msgstr "recibido el"
+
+#: apps/billing/models.py:186
+msgid "payment"
+msgstr "pago"
+
+#: apps/billing/models.py:187
+msgid "payments"
+msgstr "pagos"
+
+#: apps/billing/serializers.py:98
+msgid "UUID of an enrollment in the academic context."
+msgstr "UUID de una matrícula en el contexto académico."
+
+#: apps/billing/serializers.py:112 apps/billing/services.py:99
+msgid "An invoice needs at least one line."
+msgstr "Una factura necesita al menos una línea."
+
+#: apps/billing/serializers.py:124 apps/billing/services.py:148
+msgid "The payment amount must be positive."
+msgstr "El importe del pago debe ser positivo."
+
+#: apps/billing/services.py:95
+msgid "The referenced enrollment does not exist."
+msgstr "La matrícula referenciada no existe."
+
+#: apps/billing/services.py:97
+msgid "This enrollment is not in a billable state."
+msgstr "Esta matrícula no está en un estado facturable."
+
+#: apps/billing/services.py:104
+msgid "The due date cannot precede the issue date."
+msgstr "La fecha de vencimiento no puede ser anterior a la fecha de emisión."
+
+#: apps/billing/services.py:146
+msgid "Payments can only be recorded against an issued invoice."
+msgstr "Los pagos solo pueden registrarse sobre una factura emitida."
+
+#: apps/billing/services.py:151
+msgid "The payment exceeds the outstanding balance of the invoice."
+msgstr "El pago excede el saldo pendiente de la factura."
+
+# ---------------------------------------------------------------------------
+# App names
+# ---------------------------------------------------------------------------
+#: apps/core/apps.py:9
+msgid "Core"
+msgstr "Núcleo"
+
+# ---------------------------------------------------------------------------
+# Error messages (apps/core/exceptions.py)
+# ---------------------------------------------------------------------------
+#: apps/core/exceptions.py:46
+msgid "The operation could not be completed."
+msgstr "No se pudo completar la operación."
+
+#: apps/core/exceptions.py:52
+msgid "This operation violates a business rule."
+msgstr "Esta operación infringe una regla de negocio."
+
+#: apps/core/exceptions.py:65 apps/core/permissions.py:71
+#, fuzzy
+#| msgid "This credential does not belong to the requested institution."
+msgid "This module is not enabled for this institution."
+msgstr "Esta credencial no pertenece a la institución solicitada."
+
+#: apps/core/exceptions.py:71
+msgid "The resource is in a state that conflicts with this request."
+msgstr "El recurso está en un estado que entra en conflicto con esta solicitud."
+"El recurso está en un estado que entra en conflicto con esta solicitud."
+
+#: apps/core/exceptions.py:83
+msgid "This credential does not belong to the requested institution."
+msgstr "Esta credencial no pertenece a la institución solicitada."
+
+#: apps/core/exceptions.py:98
+msgid "The submitted data is invalid."
+msgstr "Los datos enviados no son válidos."
+
+#: apps/core/exceptions.py:100
+msgid "An error occurred."
+msgstr "Ocurrió un error."
+
+#: apps/core/exceptions.py:137
+#, python-format
+msgid "Too many attempts. Try again in %(seconds)s seconds."
+msgstr "Demasiados intentos. Inténtalo de nuevo en %(seconds)s segundos."
+
+#: apps/core/models.py:23
+msgid "ID"
+msgstr ""
+
+# ---------------------------------------------------------------------------
+# Shared field labels (apps/core/models.py)
+# ---------------------------------------------------------------------------
+#: apps/core/models.py:32 apps/tenants/models.py:118
+msgid "created at"
+msgstr "creado el"
+
+#: apps/core/models.py:34 apps/tenants/models.py:119
+msgid "updated at"
+msgstr "actualizado el"
+
+#: apps/core/models.py:43 apps/tenants/models.py:114 apps/users/models.py:73
+msgid "active"
+msgstr "activo"
+
+#: apps/core/models.py:45 apps/tenants/models.py:116 apps/users/models.py:75
+msgid "deleted at"
+msgstr "eliminado el"
+
+#: apps/core/modules.py:30 apps/users/apps.py:9
+msgid "Users"
+msgstr "Usuarios"
+
+#: apps/core/modules.py:32
+#, fuzzy
+#| msgid "subjects"
+msgid "Subjects"
+msgstr "asignaturas"
+
+#: apps/core/modules.py:33
+msgid "Gradebook"
+msgstr "Calificaciones"
+
+#: apps/core/modules.py:35
+msgid "Schedule"
+msgstr "Horarios"
+
+#: apps/core/modules.py:36
+msgid "Attendance"
+msgstr "Asistencia"
+
+#: apps/identity/models.py:36 apps/users/models.py:45
+msgid "email address"
+msgstr "correo electrónico"
+
+#: apps/identity/models.py:37 apps/users/models.py:46
+msgid "first name"
+msgstr "nombre"
+
+#: apps/identity/models.py:38 apps/users/models.py:47
+msgid "last name"
+msgstr "apellidos"
+
+#: apps/identity/models.py:39 apps/users/models.py:48
+msgid "phone"
+msgstr "teléfono"
+
+# ---------------------------------------------------------------------------
+# Languages / settings
+# ---------------------------------------------------------------------------
+#: apps/identity/models.py:43 apps/tenants/models.py:60 apps/users/models.py:61
+#: config/settings/base.py:216
+msgid "Spanish"
+msgstr "Español"
+
+#: apps/identity/models.py:43 apps/tenants/models.py:60 apps/users/models.py:61
+#: config/settings/base.py:217
+msgid "English"
+msgstr "Inglés"
+
+#: apps/identity/models.py:45 apps/users/models.py:63
+msgid "preferred language"
+msgstr "idioma preferido"
+
+#: apps/identity/models.py:48
+msgid "password"
+msgstr "contraseña"
+
+#: apps/identity/models.py:49
+#, fuzzy
+#| msgid "last name"
+msgid "last login"
+msgstr "apellidos"
+
+#: apps/identity/models.py:60
+#, fuzzy
+#| msgid "institutions"
+msgid "last institution used"
+msgstr "instituciones"
+
+#: apps/identity/models.py:64 apps/users/models.py:90
+#, fuzzy
+#| msgid "Platform administrator"
+msgid "platform identity"
+msgstr "Administrador de la plataforma"
+
+#: apps/identity/models.py:65
+msgid "platform identities"
+msgstr "identidades de plataforma"
+
+#: apps/identity/models.py:109
+#, fuzzy
+#| msgid "quantity"
+msgid "identity"
+msgstr "cantidad"
+
+# ---------------------------------------------------------------------------
+# Tenants (apps/tenants)
+# ---------------------------------------------------------------------------
+#: apps/identity/models.py:115 apps/tenants/models.py:128
+msgid "institution"
+msgstr "institución"
+
+#: apps/identity/models.py:121 apps/users/models.py:55
+msgid "role"
+msgstr "rol"
+
+#: apps/identity/models.py:125
+msgid "membership"
+msgstr "membresía"
+
+#: apps/identity/models.py:126
+msgid "memberships"
+msgstr "membresías"
+
+#: apps/identity/serializers.py:32
+msgid ""
+"Platform administration is not a membership of a school. Grant it on a "
+"platform account instead."
+msgstr ""
+
+#: apps/identity/serializers.py:71
+msgid "A platform identity with this email exists."
+msgstr "Ya existe una identidad de plataforma con este correo."
+
+#: apps/identity/services.py:32
+#, fuzzy
+#| msgid "This credential does not belong to the requested institution."
+msgid "This account is not registered at any active institution."
+msgstr "Esta credencial no pertenece a la institución solicitada."
+
+#: apps/tenants/apps.py:9
+msgid "Institutions"
+msgstr "Instituciones"
+
+#: apps/tenants/models.py:34
+msgid "Mexican peso"
+msgstr "peso mexicano"
+
+#: apps/tenants/models.py:35
+msgid "US dollar"
+msgstr "dólar estadounidense"
+
+#: apps/tenants/models.py:52
+msgid "legal name"
+msgstr "razón social"
+
+#: apps/tenants/models.py:53
+msgid "tax ID"
+msgstr "identificación fiscal"
+
+#: apps/tenants/models.py:61
+msgid "default language"
+msgstr "idioma predeterminado"
+
+#: apps/tenants/models.py:63
+msgid "timezone"
+msgstr "zona horaria"
+
+#: apps/tenants/models.py:73
+#, fuzzy
+#| msgid "currency"
+msgid "default currency"
+msgstr "moneda"
+
+#: apps/tenants/models.py:74
+msgid "Currency used for every invoice issued by this institution."
+msgstr "Moneda de todas las facturas que emite esta institución."
+
+#: apps/tenants/models.py:89
+msgid "Use a six-digit hex colour, e.g. #1d4ed8."
+msgstr "Usa un color hexadecimal de seis dígitos, por ejemplo #1d4ed8."
+
+#: apps/tenants/models.py:92
+msgid "brand colour"
+msgstr "color de marca"
+
+#: apps/tenants/models.py:93
+msgid "Six-digit hex. The rest of the palette is derived from it."
+msgstr "Hexadecimal de seis dígitos. El resto de la paleta se deriva de él."
+
+#: apps/tenants/models.py:106
+msgid "disabled modules"
+msgstr "módulos deshabilitados"
+
+#: apps/tenants/models.py:107
+msgid "Modules switched off for this institution. Empty means all are on."
+msgstr "Módulos apagados en esta institución. Vacío significa que están todos encendidos."
+
+#: apps/tenants/models.py:111
+msgid "on trial"
+msgstr "en periodo de prueba"
+
+#: apps/tenants/models.py:112
+msgid "paid until"
+msgstr "pagado hasta"
+
+#: apps/tenants/models.py:129
+msgid "institutions"
+msgstr "instituciones"
+
+#: apps/tenants/models.py:169
+msgid "domain"
+msgstr "dominio"
+
+#: apps/tenants/models.py:170
+msgid "domains"
+msgstr "dominios"
+
+#: apps/tenants/serializers.py:102
+#, python-format
+msgid "These modules cannot be switched off: %(names)s."
+msgstr "Estos módulos no se pueden apagar: %(names)s."
+
+#: apps/users/admin.py:18
+msgid "Personal info"
+msgstr "Información personal"
+
+#: apps/users/admin.py:19
+msgid "Role & locale"
+msgstr "Rol e idioma"
+
+#: apps/users/admin.py:21
+msgid "Permissions"
+msgstr "Permisos"
+
+#: apps/users/admin.py:32
+msgid "Important dates"
+msgstr "Fechas importantes"
+
+#: apps/users/managers.py:19
+msgid "An email address is required."
+msgstr "Se requiere un correo electrónico."
+
+#: apps/users/managers.py:36
+msgid "Superusers must have is_staff=True."
+msgstr "Los superusuarios deben tener is_staff=True."
+
+#: apps/users/managers.py:38
+msgid "Superusers must have is_superuser=True."
+msgstr "Los superusuarios deben tener is_superuser=True."
+
+#: apps/users/models.py:33
+msgid "Platform administrator"
+msgstr "Administrador de la plataforma"
+
+#: apps/users/models.py:34
+msgid "School administrator"
+msgstr "Administrador del colegio"
+
+#: apps/users/models.py:35
+msgid "Academic coordinator"
+msgstr "Coordinador académico"
+
+#: apps/users/models.py:36
+msgid "Teacher"
+msgstr "Docente"
+
+#: apps/users/models.py:37
+msgid "Student"
+msgstr "Estudiante"
+
+#: apps/users/models.py:38
+msgid "Guardian"
+msgstr "Tutor"
+
+#: apps/users/models.py:39
+msgid "Accountant"
+msgstr "Contador"
+
+#: apps/users/models.py:68
+msgid "staff status"
+msgstr "es personal"
+
+#: apps/users/models.py:69
+msgid "Designates whether the user can log into the admin site."
+msgstr "Indica si el usuario puede acceder al sitio de administración."
+
+#: apps/users/models.py:91
+msgid "Set when the person signs in with a platform-wide credential."
+msgstr "Se establece cuando la persona entra con una credencial de plataforma."
+
+#: apps/users/models.py:94
+msgid "date joined"
+msgstr "fecha de alta"
+
+# ---------------------------------------------------------------------------
+# Users (apps/users)
+# ---------------------------------------------------------------------------
+#: apps/users/models.py:103
+msgid "user"
+msgstr "usuario"
+
+#: apps/users/models.py:104
+msgid "users"
+msgstr "usuarios"
+
+#: apps/users/serializers.py:41
+msgid "Platform administration is not a role within an institution."
+msgstr "La administración de la plataforma no es un rol dentro de una institución."
+
+#: apps/users/serializers.py:55
+msgid "You cannot grant a role at or above your own."
+msgstr "No puedes otorgar un rol igual o superior al tuyo."
+
+#: apps/users/serializers.py:115
+#, fuzzy
+#| msgid "An email address is required."
+msgid "This email address is not available."
+msgstr "Se requiere un correo electrónico."
+
+#: apps/users/serializers.py:190
+msgid "The current password is incorrect."
+msgstr "La contraseña actual es incorrecta."

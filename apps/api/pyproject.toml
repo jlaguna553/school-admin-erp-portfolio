@@ -1,0 +1,49 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".venv", "*/migrations/*"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "DJ",   # flake8-django
+    "C4",   # comprehensions
+    "SIM",  # simplify
+]
+ignore = [
+    "E501",  # line length is handled by the formatter
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "config"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+strict_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true
+exclude = ["\\.venv", "migrations"]
+
+[[tool.mypy.overrides]]
+module = ["django_tenants.*", "modeltranslation.*", "environ.*", "drf_spectacular.*"]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings.dev"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py", "*_test.py"]
+# `--ds` is passed explicitly because it outranks the DJANGO_SETTINGS_MODULE
+# environment variable, which the Docker image sets to config.settings.dev.
+# Without it the suite silently runs against dev settings, where ALLOWED_HOSTS
+# rejects the per-tenant hostnames and django-tenants turns the resulting
+# DisallowedHost into a bare 404.
+addopts = "--ds=config.settings.test --reuse-db --strict-markers"
+testpaths = ["apps", "tests"]

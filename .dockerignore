@@ -1,0 +1,36 @@
+# Build context for the web image is the repo root, so this must exclude
+# everything heavy that the pnpm build does not need.
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+**/out
+
+# Python side is built from its own context (apps/api/.dockerignore)
+apps/api/.venv
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+apps/api/staticfiles
+apps/api/mediafiles
+
+# Secrets & local state
+**/.env
+**/.env.local
+**/.env.*.local
+
+# VCS / editors / docs
+.git
+.gitignore
+.idea
+.vscode
+docs
+**/*.md
+!README.md
+
+# Test output
+**/test-results
+**/playwright-report
+**/coverage

@@ -1,0 +1,6787 @@
+openapi: 3.0.3
+info:
+  title: School Administration ERP API
+  version: 0.1.0
+  description: Multi-tenant, internationalized ERP for educational institutions. Each
+    school is isolated in its own Postgres schema and resolved from the request host.
+paths:
+  /api/health/:
+    get:
+      operationId: api_health_retrieve
+      description: |-
+        Unauthenticated liveness probe that also reports tenant resolution.
+
+        Useful during onboarding: hitting it on a school's host confirms the domain
+        is mapped to the right Postgres schema before any real request is made.
+      tags:
+      - api
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+              examples:
+                ResolvedTenant:
+                  value:
+                    status: ok
+                    schema: northfield
+                    language: es
+                    available_languages:
+                    - es
+                    - en
+                  summary: Resolved tenant
+          description: ''
+  /api/v1/academic/academic-years/:
+    get:
+      operationId: academic_academic_years_list
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: is_current
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAcademicYearList'
+          description: ''
+    post:
+      operationId: academic_academic_years_create
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcademicYearRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AcademicYearRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AcademicYearRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicYear'
+          description: ''
+  /api/v1/academic/academic-years/{id}/:
+    get:
+      operationId: academic_academic_years_retrieve
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this año académico.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicYear'
+          description: ''
+    put:
+      operationId: academic_academic_years_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this año académico.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcademicYearRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AcademicYearRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AcademicYearRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicYear'
+          description: ''
+    patch:
+      operationId: academic_academic_years_partial_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this año académico.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAcademicYearRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAcademicYearRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAcademicYearRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicYear'
+          description: ''
+    delete:
+      operationId: academic_academic_years_destroy
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this año académico.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/academic/assessments/:
+    get:
+      operationId: academic_assessments_list
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      summary: List assessments
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: subject
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: term
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssessmentList'
+          description: ''
+    post:
+      operationId: academic_assessments_create
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      summary: Add an assessment to a subject
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssessmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssessmentRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+          description: ''
+  /api/v1/academic/assessments/{assessment_id}/grades/:
+    put:
+      operationId: academic_assessments_grades_update
+      description: |-
+        Record every mark for one assessment in a single call.
+
+        Marking is done a column at a time -- a teacher sits with one exam and goes
+        down the list -- so the endpoint matches the act. One request per cell would
+        also make a half-saved column the normal outcome of a dropped connection;
+        this way the column lands or it does not.
+      summary: Record marks for an assessment
+      parameters:
+      - in: path
+        name: assessment_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/GradeInputRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/GradeInputRequest'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/GradeInputRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Grade'
+          description: ''
+  /api/v1/academic/assessments/{id}/:
+    get:
+      operationId: academic_assessments_retrieve
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this assessment.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+          description: ''
+    put:
+      operationId: academic_assessments_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this assessment.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssessmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssessmentRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+          description: ''
+    patch:
+      operationId: academic_assessments_partial_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this assessment.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAssessmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAssessmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAssessmentRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+          description: ''
+    delete:
+      operationId: academic_assessments_destroy
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this assessment.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/academic/attendance/weekly/:
+    get:
+      operationId: academic_attendance_weekly_list
+      description: 'A trailing window ending today. ``recorded`` is how many marks
+        the percentage rests on: a day with none is a day nobody took a roll, not
+        a day of zero attendance.'
+      summary: Daily attendance rate
+      parameters:
+      - in: query
+        name: days
+        schema:
+          type: integer
+        description: Default 7, max 90.
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AttendancePoint'
+          description: ''
+  /api/v1/academic/classes/today/:
+    get:
+      operationId: academic_classes_today_list
+      description: |-
+        The classes on one date, with whether the roll has been taken.
+
+        The entry point to attendance: a teacher opens the day and sees what they
+        are teaching and what is still unrecorded. Two questions in one call,
+        because the second one -- "have I done this yet" -- is the whole reason for
+        the screen, and asking it per class would be one request per row.
+      summary: Classes on a date, and their registers
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+        description: Defaults to today.
+      - in: query
+        name: group
+        schema:
+          type: string
+      - in: query
+        name: teacher
+        schema:
+          type: string
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Roll'
+          description: ''
+  /api/v1/academic/enrollments/:
+    get:
+      operationId: academic_enrollments_list
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: query
+        name: academic_year
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: group
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: program
+        schema:
+          type: string
+          format: uuid
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Estado
+          enum:
+          - active
+          - completed
+          - pending
+          - withdrawn
+        description: |-
+          * `pending` - Pendiente
+          * `active` - Activa
+          * `withdrawn` - Retirada
+          * `completed` - Completada
+      - in: query
+        name: student
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnrollmentList'
+          description: ''
+    post:
+      operationId: academic_enrollments_create
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+          description: ''
+  /api/v1/academic/enrollments/{id}/:
+    get:
+      operationId: academic_enrollments_retrieve
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this matrícula.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+          description: ''
+    put:
+      operationId: academic_enrollments_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this matrícula.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+          description: ''
+    patch:
+      operationId: academic_enrollments_partial_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this matrícula.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEnrollmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEnrollmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEnrollmentRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+          description: ''
+    delete:
+      operationId: academic_enrollments_destroy
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this matrícula.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/academic/gradebook/:
+    get:
+      operationId: academic_gradebook_retrieve
+      description: |-
+        One subject, one period: every enrolled student and every mark.
+
+        A single request rather than a grid the client assembles from three, because
+        the interface is useless until it has all of it -- and because the average
+        is computed the same way for everyone, server-side, instead of being
+        reimplemented in the browser.
+      summary: The gradebook for a subject in a period
+      parameters:
+      - in: query
+        name: subject
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: term
+        schema:
+          type: string
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gradebook'
+          description: ''
+  /api/v1/academic/groups/:
+    get:
+      operationId: academic_groups_list
+      description: Sections of a programme -- the unit a timetable and a register
+        need.
+      summary: List groups
+      parameters:
+      - in: query
+        name: academic_year
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: program
+        schema:
+          type: string
+          format: uuid
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: tutor
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStudentGroupList'
+          description: ''
+    post:
+      operationId: academic_groups_create
+      description: Sections of a programme -- the unit a timetable and a register
+        need.
+      summary: Open a group
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentGroupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentGroupRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentGroup'
+          description: ''
+  /api/v1/academic/groups/{id}/:
+    get:
+      operationId: academic_groups_retrieve
+      description: Sections of a programme -- the unit a timetable and a register
+        need.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this grupo.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentGroup'
+          description: ''
+    put:
+      operationId: academic_groups_update
+      description: Sections of a programme -- the unit a timetable and a register
+        need.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this grupo.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentGroupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentGroupRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentGroup'
+          description: ''
+    patch:
+      operationId: academic_groups_partial_update
+      description: Sections of a programme -- the unit a timetable and a register
+        need.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this grupo.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentGroupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentGroupRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentGroup'
+          description: ''
+    delete:
+      operationId: academic_groups_destroy
+      description: Sections of a programme -- the unit a timetable and a register
+        need.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this grupo.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/academic/programs/:
+    get:
+      operationId: academic_programs_list
+      description: '``name`` and ``description`` are returned in the language resolved
+        for the request. Send ``Accept-Language: en`` for English.'
+      summary: List programmes
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProgramList'
+          description: ''
+    post:
+      operationId: academic_programs_create
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgramRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProgramRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProgramRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+          description: ''
+  /api/v1/academic/programs/{id}/:
+    get:
+      operationId: academic_programs_retrieve
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this programa.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+          description: ''
+    put:
+      operationId: academic_programs_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this programa.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgramRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProgramRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProgramRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+          description: ''
+    patch:
+      operationId: academic_programs_partial_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this programa.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProgramRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProgramRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProgramRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+          description: ''
+    delete:
+      operationId: academic_programs_destroy
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this programa.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/academic/roll/:
+    get:
+      operationId: academic_roll_retrieve
+      description: Read and write the register for one class on one date.
+      summary: The register for a class on a date
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+        description: Defaults to today.
+      - in: query
+        name: slot
+        schema:
+          type: string
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Roll'
+          description: ''
+    put:
+      operationId: academic_roll_update
+      description: Read and write the register for one class on one date.
+      summary: Take the roll
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollInputRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RollInputRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RollInputRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Roll'
+          description: ''
+  /api/v1/academic/subjects/:
+    get:
+      operationId: academic_subjects_list
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: program
+        schema:
+          type: string
+          format: uuid
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: teacher
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubjectList'
+          description: ''
+    post:
+      operationId: academic_subjects_create
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubjectRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubjectRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+          description: ''
+  /api/v1/academic/subjects/{id}/:
+    get:
+      operationId: academic_subjects_retrieve
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this asignatura.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+          description: ''
+    put:
+      operationId: academic_subjects_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this asignatura.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubjectRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubjectRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubjectRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+          description: ''
+    patch:
+      operationId: academic_subjects_partial_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this asignatura.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSubjectRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSubjectRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSubjectRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subject'
+          description: ''
+    delete:
+      operationId: academic_subjects_destroy
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this asignatura.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/academic/terms/:
+    get:
+      operationId: academic_terms_list
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      summary: List evaluation periods
+      parameters:
+      - in: query
+        name: academic_year
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: is_current
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTermList'
+          description: ''
+    post:
+      operationId: academic_terms_create
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      summary: Open an evaluation period
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TermRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TermRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TermRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Term'
+          description: ''
+  /api/v1/academic/terms/{id}/:
+    get:
+      operationId: academic_terms_retrieve
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this evaluation period.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Term'
+          description: ''
+    put:
+      operationId: academic_terms_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this evaluation period.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TermRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TermRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TermRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Term'
+          description: ''
+    patch:
+      operationId: academic_terms_partial_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this evaluation period.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTermRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTermRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTermRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Term'
+          description: ''
+    delete:
+      operationId: academic_terms_destroy
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this evaluation period.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/academic/timetable/:
+    get:
+      operationId: academic_timetable_list
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      summary: List timetable entries
+      parameters:
+      - in: query
+        name: group
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: subject
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: teacher
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: weekday
+        schema:
+          type: integer
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+        description: |-
+          * `1` - lunes
+          * `2` - martes
+          * `3` - miércoles
+          * `4` - jueves
+          * `5` - viernes
+          * `6` - sábado
+          * `7` - domingo
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTimetableSlotList'
+          description: ''
+    post:
+      operationId: academic_timetable_create
+      description: Refused when the group, the teacher or the room is already busy
+        at that hour. Every clash is reported at once, on the field that caused it.
+      summary: Add a class to the timetable
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimetableSlotRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TimetableSlotRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TimetableSlotRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimetableSlot'
+          description: ''
+  /api/v1/academic/timetable/{id}/:
+    get:
+      operationId: academic_timetable_retrieve
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this timetable entry.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimetableSlot'
+          description: ''
+    put:
+      operationId: academic_timetable_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this timetable entry.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimetableSlotRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TimetableSlotRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TimetableSlotRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimetableSlot'
+          description: ''
+    patch:
+      operationId: academic_timetable_partial_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this timetable entry.
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTimetableSlotRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTimetableSlotRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTimetableSlotRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimetableSlot'
+          description: ''
+    delete:
+      operationId: academic_timetable_destroy
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this timetable entry.
+        required: true
+      tags:
+      - academic
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Exchanges credentials for an access token.
+
+        One hostname serves every institution, so the school is not resolved from the request: the credential is looked up platform-wide and the response says which schools the account is registered at. The session opens at the one used last, and `schools` lists them all -- a client with one entry renders no switcher, but still knows where it is. It is empty only for a platform operator, who is above every school.
+
+        The **refresh token is returned as an httpOnly cookie**, not in the body, so JavaScript cannot read it. Set `AUTH_REFRESH_IN_BODY=True` to also include it for native clients that cannot use cookies.
+      summary: Log in
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: Blacklists the refresh token so it cannot be replayed, and clears
+        the httpOnly cookie. The token is taken from the body if supplied, otherwise
+        from the cookie.
+      summary: Log out
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/refresh/:
+    post:
+      operationId: auth_refresh_create
+      description: Reads the refresh token from the request body if present, otherwise
+        from the httpOnly cookie set at login. Rotation is enabled, so a new cookie
+        is issued on every call and the previous token is blacklisted.
+      summary: Refresh the access token
+      tags:
+      - auth
+      security:
+      - {}
+      responses:
+        '200':
+          description: A new access token.
+  /api/v1/auth/schools/:
+    get:
+      operationId: auth_schools_list
+      description: Every school the caller may work at, current one included. Empty
+        for a platform operator. Each entry carries the school's currency and brand
+        colour so the client can repaint immediately after switching, without a second
+        round trip.
+      summary: Schools the signed-in person can reach
+      tags:
+      - auth
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailableSchool'
+          description: ''
+  /api/v1/auth/switch/:
+    post:
+      operationId: auth_switch_create
+      description: |-
+        Re-issue the session against a different school.
+
+        Under the old host-per-school model this was a navigation to another origin,
+        which meant signing in again -- the refresh cookie is host-only. On one
+        domain the session stays where it is and only the tenant claim changes, so
+        switching costs a round trip instead of a password.
+
+        The membership is re-read here rather than trusted from the list the client
+        was handed at login: that list may be minutes old, and access can be revoked
+        in between.
+      summary: Switch to another of your schools
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwitchSchoolRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SwitchSchoolRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SwitchSchoolRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          description: A token scoped to the chosen school.
+  /api/v1/auth/verify/:
+    post:
+      operationId: auth_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      summary: Verify a token
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerifyRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/billing/invoices/:
+    get:
+      operationId: billing_invoices_list
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: query
+        name: currency
+        schema:
+          type: string
+      - in: query
+        name: enrollment_id
+        schema:
+          type: string
+          format: uuid
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Estado
+          enum:
+          - cancelled
+          - draft
+          - issued
+          - overdue
+          - paid
+          - partially_paid
+        description: |-
+          * `draft` - Borrador
+          * `issued` - Emitida
+          * `partially_paid` - Parcialmente pagada
+          * `paid` - Pagada
+          * `overdue` - Vencida
+          * `cancelled` - Cancelada
+      - in: query
+        name: student_id
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - billing
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+          description: ''
+    post:
+      operationId: billing_invoices_create
+      description: Validates the enrollment through the academic context's service
+        layer, then issues the invoice with a snapshot of the student and programme
+        names.
+      summary: Issue an invoice
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvoiceCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvoiceCreateRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+  /api/v1/billing/invoices/{id}/:
+    get:
+      operationId: billing_invoices_retrieve
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this factura.
+        required: true
+      tags:
+      - billing
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+    put:
+      operationId: billing_invoices_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this factura.
+        required: true
+      tags:
+      - billing
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+    patch:
+      operationId: billing_invoices_partial_update
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this factura.
+        required: true
+      tags:
+      - billing
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+    delete:
+      operationId: billing_invoices_destroy
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      summary: Void an invoice (soft delete)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this factura.
+        required: true
+      tags:
+      - billing
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/billing/invoices/{id}/enrollment/:
+    get:
+      operationId: billing_invoices_enrollment_retrieve
+      description: Resolves the live academic state behind the invoice's stored ``enrollment_id``
+        via the academic service layer -- no JOIN.
+      summary: Enrollment context for this invoice
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this factura.
+        required: true
+      tags:
+      - billing
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+  /api/v1/billing/invoices/{id}/payments/:
+    post:
+      operationId: billing_invoices_payments_create
+      description: |-
+        ``ModelViewSet`` whose ``DELETE`` deactivates the record (rule A.3).
+
+        ``BaseModel.delete()`` is already a soft delete, so ``perform_destroy`` needs
+        no override -- but it is spelled out here so the behaviour is discoverable
+        at the API layer rather than only in the model.
+      summary: Record a payment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this factura.
+        required: true
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/v1/branding/:
+    get:
+      operationId: branding_retrieve
+      description: |-
+        The institution's name and brand colour, resolved from the request host.
+
+        Deliberately unauthenticated. Branding has to be on screen *before* anyone
+        signs in -- the login page is where a school's identity matters most -- and
+        the frontend renders it server-side to avoid a flash of the default palette.
+        Nothing here is a secret: it is the same name and colour every visitor to
+        that hostname already sees.
+      tags:
+      - branding
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Branding'
+          description: ''
+  /api/v1/identities/:
+    get:
+      operationId: identities_list
+      description: |-
+        People who may work at more than one school.
+
+        Platform operators only, and public host only. The membership list is the
+        sensitive part: it says which schools employ a given person, which no single
+        school is entitled to read about another.
+      summary: List people with platform-wide credentials
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: language
+        schema:
+          type: string
+          title: Idioma preferido
+          enum:
+          - en
+          - es
+        description: |-
+          * `es` - Español
+          * `en` - Inglés
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - identities
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPlatformIdentityList'
+          description: ''
+    post:
+      operationId: identities_create
+      description: |-
+        Respond with the full record, not the write-only input shape.
+
+        The create serializer exists to accept a password; echoing it back would
+        return a body with no ``id``, leaving a caller unable to do the obvious
+        next thing -- grant the person their first school.
+      summary: Create a platform identity
+      tags:
+      - identities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlatformIdentityCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PlatformIdentityCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PlatformIdentityCreateRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformIdentityCreate'
+          description: ''
+  /api/v1/identities/{id}/:
+    get:
+      operationId: identities_retrieve
+      description: |-
+        People who may work at more than one school.
+
+        Platform operators only, and public host only. The membership list is the
+        sensitive part: it says which schools employ a given person, which no single
+        school is entitled to read about another.
+      summary: Retrieve a person and their schools
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this platform identity.
+        required: true
+      tags:
+      - identities
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformIdentity'
+          description: ''
+    put:
+      operationId: identities_update
+      description: |-
+        People who may work at more than one school.
+
+        Platform operators only, and public host only. The membership list is the
+        sensitive part: it says which schools employ a given person, which no single
+        school is entitled to read about another.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this platform identity.
+        required: true
+      tags:
+      - identities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlatformIdentityRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PlatformIdentityRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PlatformIdentityRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformIdentity'
+          description: ''
+    patch:
+      operationId: identities_partial_update
+      description: |-
+        People who may work at more than one school.
+
+        Platform operators only, and public host only. The membership list is the
+        sensitive part: it says which schools employ a given person, which no single
+        school is entitled to read about another.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this platform identity.
+        required: true
+      tags:
+      - identities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPlatformIdentityRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPlatformIdentityRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPlatformIdentityRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformIdentity'
+          description: ''
+    delete:
+      operationId: identities_destroy
+      description: Soft delete. Blocks sign-in at every school at once, which is the
+        point of a single credential -- revoking access no longer means hunting through
+        each school's user list.
+      summary: Deactivate a person
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this platform identity.
+        required: true
+      tags:
+      - identities
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/identities/{id}/memberships/:
+    post:
+      operationId: identities_memberships_create
+      description: |-
+        People who may work at more than one school.
+
+        Platform operators only, and public host only. The membership list is the
+        sensitive part: it says which schools employ a given person, which no single
+        school is entitled to read about another.
+      summary: Grant access to a school
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this platform identity.
+        required: true
+      tags:
+      - identities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MembershipRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MembershipRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+  /api/v1/identities/{id}/memberships/{membership_id}/:
+    delete:
+      operationId: identities_memberships_destroy
+      description: |-
+        People who may work at more than one school.
+
+        Platform operators only, and public host only. The membership list is the
+        sensitive part: it says which schools employ a given person, which no single
+        school is entitled to read about another.
+      summary: Revoke access to a school
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this platform identity.
+        required: true
+      - in: path
+        name: membership_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - identities
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/identities/{id}/set-password/:
+    post:
+      operationId: identities_set_password_create
+      description: The recovery path when someone is locked out of every school.
+      summary: Reset a person's password
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this platform identity.
+        required: true
+      tags:
+      - identities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetIdentityPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetIdentityPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetIdentityPasswordRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/tenants/:
+    get:
+      operationId: tenants_list
+      description: |-
+        Platform-operator API for onboarding and managing institutions.
+
+        Shares a hostname with everything else, so ``IsPlatformAdmin`` is the whole
+        of the separation: it requires the caller to be platform staff acting on the
+        public schema, which a school's session never is.
+      summary: List institutions
+      parameters:
+      - in: query
+        name: default_language
+        schema:
+          type: string
+          title: Idioma predeterminado
+          enum:
+          - en
+          - es
+        description: |-
+          * `es` - Español
+          * `en` - Inglés
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: on_trial
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - tenants
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedClientList'
+          description: ''
+    post:
+      operationId: tenants_create
+      description: 'Creates the institution and its dedicated Postgres schema. Schema
+        creation runs the full tenant migration set, so this call is slower than a
+        normal create. No hostname is involved: one domain serves every school, and
+        which one a request is for comes from the token.'
+      summary: Provision an institution
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientProvisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClientProvisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClientProvisionRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientProvision'
+          description: ''
+  /api/v1/tenants/{client_pk}/users/:
+    get:
+      operationId: tenants_users_list
+      description: |-
+        Platform-operator access to the users *inside* a given institution.
+
+        This is the one place where a platform operator reads and writes data
+        belonging to a school without holding a session there. It exists so a
+        locked-out institution can be recovered -- create the first administrator,
+        fix a role, deactivate an account.
+
+        The schema switch is deliberately narrow. Authentication and the
+        ``IsPlatformAdmin`` check run first, against the *public* schema, because
+        that is where platform staff live; entering the school's schema any earlier
+        would look the caller's own token up in the school's user table and either
+        reject a valid operator or, worse, match a different person with the same
+        id. Only once the caller is known to be a platform operator does the
+        connection move into the target schema, and it moves back in
+        ``finalize_response`` -- by which point every serializer has already been
+        evaluated, so nothing is left to read from the wrong schema.
+
+        Granting ``platform_admin`` is still refused here, by the same validator the
+        school's own endpoint uses: that role only means anything in the public
+        schema, so a copy of it sitting in a school's table would be a confusing
+        no-op rather than a privilege.
+      summary: List the users of one institution
+      parameters:
+      - in: path
+        name: client_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: language
+        schema:
+          type: string
+          title: Idioma preferido
+          enum:
+          - en
+          - es
+        description: |-
+          * `es` - Español
+          * `en` - Inglés
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+          title: Rol
+          enum:
+          - accountant
+          - coordinator
+          - guardian
+          - platform_admin
+          - school_admin
+          - student
+          - teacher
+        description: |-
+          * `platform_admin` - Administrador de la plataforma
+          * `school_admin` - Administrador del colegio
+          * `coordinator` - Coordinador académico
+          * `teacher` - Docente
+          * `student` - Estudiante
+          * `guardian` - Tutor
+          * `accountant` - Contador
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - tenants
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: tenants_users_create
+      description: |-
+        Platform-operator access to the users *inside* a given institution.
+
+        This is the one place where a platform operator reads and writes data
+        belonging to a school without holding a session there. It exists so a
+        locked-out institution can be recovered -- create the first administrator,
+        fix a role, deactivate an account.
+
+        The schema switch is deliberately narrow. Authentication and the
+        ``IsPlatformAdmin`` check run first, against the *public* schema, because
+        that is where platform staff live; entering the school's schema any earlier
+        would look the caller's own token up in the school's user table and either
+        reject a valid operator or, worse, match a different person with the same
+        id. Only once the caller is known to be a platform operator does the
+        connection move into the target schema, and it moves back in
+        ``finalize_response`` -- by which point every serializer has already been
+        evaluated, so nothing is left to read from the wrong schema.
+
+        Granting ``platform_admin`` is still refused here, by the same validator the
+        school's own endpoint uses: that role only means anything in the public
+        schema, so a copy of it sitting in a school's table would be a confusing
+        no-op rather than a privilege.
+      summary: Create a user at one institution
+      parameters:
+      - in: path
+        name: client_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreate'
+          description: ''
+  /api/v1/tenants/{client_pk}/users/{id}/:
+    get:
+      operationId: tenants_users_retrieve
+      description: |-
+        Platform-operator access to the users *inside* a given institution.
+
+        This is the one place where a platform operator reads and writes data
+        belonging to a school without holding a session there. It exists so a
+        locked-out institution can be recovered -- create the first administrator,
+        fix a role, deactivate an account.
+
+        The schema switch is deliberately narrow. Authentication and the
+        ``IsPlatformAdmin`` check run first, against the *public* schema, because
+        that is where platform staff live; entering the school's schema any earlier
+        would look the caller's own token up in the school's user table and either
+        reject a valid operator or, worse, match a different person with the same
+        id. Only once the caller is known to be a platform operator does the
+        connection move into the target schema, and it moves back in
+        ``finalize_response`` -- by which point every serializer has already been
+        evaluated, so nothing is left to read from the wrong schema.
+
+        Granting ``platform_admin`` is still refused here, by the same validator the
+        school's own endpoint uses: that role only means anything in the public
+        schema, so a copy of it sitting in a school's table would be a confusing
+        no-op rather than a privilege.
+      summary: Retrieve a user of one institution
+      parameters:
+      - in: path
+        name: client_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: tenants_users_update
+      description: |-
+        Platform-operator access to the users *inside* a given institution.
+
+        This is the one place where a platform operator reads and writes data
+        belonging to a school without holding a session there. It exists so a
+        locked-out institution can be recovered -- create the first administrator,
+        fix a role, deactivate an account.
+
+        The schema switch is deliberately narrow. Authentication and the
+        ``IsPlatformAdmin`` check run first, against the *public* schema, because
+        that is where platform staff live; entering the school's schema any earlier
+        would look the caller's own token up in the school's user table and either
+        reject a valid operator or, worse, match a different person with the same
+        id. Only once the caller is known to be a platform operator does the
+        connection move into the target schema, and it moves back in
+        ``finalize_response`` -- by which point every serializer has already been
+        evaluated, so nothing is left to read from the wrong schema.
+
+        Granting ``platform_admin`` is still refused here, by the same validator the
+        school's own endpoint uses: that role only means anything in the public
+        schema, so a copy of it sitting in a school's table would be a confusing
+        no-op rather than a privilege.
+      parameters:
+      - in: path
+        name: client_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: tenants_users_partial_update
+      description: |-
+        Platform-operator access to the users *inside* a given institution.
+
+        This is the one place where a platform operator reads and writes data
+        belonging to a school without holding a session there. It exists so a
+        locked-out institution can be recovered -- create the first administrator,
+        fix a role, deactivate an account.
+
+        The schema switch is deliberately narrow. Authentication and the
+        ``IsPlatformAdmin`` check run first, against the *public* schema, because
+        that is where platform staff live; entering the school's schema any earlier
+        would look the caller's own token up in the school's user table and either
+        reject a valid operator or, worse, match a different person with the same
+        id. Only once the caller is known to be a platform operator does the
+        connection move into the target schema, and it moves back in
+        ``finalize_response`` -- by which point every serializer has already been
+        evaluated, so nothing is left to read from the wrong schema.
+
+        Granting ``platform_admin`` is still refused here, by the same validator the
+        school's own endpoint uses: that role only means anything in the public
+        schema, so a copy of it sitting in a school's table would be a confusing
+        no-op rather than a privilege.
+      summary: Update a user, including their role
+      parameters:
+      - in: path
+        name: client_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: tenants_users_destroy
+      description: Soft delete -- the row is retained and login is blocked.
+      summary: Deactivate a user of one institution
+      parameters:
+      - in: path
+        name: client_pk
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/tenants/{id}/:
+    get:
+      operationId: tenants_retrieve
+      description: |-
+        Platform-operator API for onboarding and managing institutions.
+
+        Shares a hostname with everything else, so ``IsPlatformAdmin`` is the whole
+        of the separation: it requires the caller to be platform staff acting on the
+        public schema, which a school's session never is.
+      summary: Retrieve an institution
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this institución.
+        required: true
+      tags:
+      - tenants
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+          description: ''
+    put:
+      operationId: tenants_update
+      description: |-
+        Platform-operator API for onboarding and managing institutions.
+
+        Shares a hostname with everything else, so ``IsPlatformAdmin`` is the whole
+        of the separation: it requires the caller to be platform staff acting on the
+        public schema, which a school's session never is.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this institución.
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClientRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+          description: ''
+    patch:
+      operationId: tenants_partial_update
+      description: |-
+        Platform-operator API for onboarding and managing institutions.
+
+        Shares a hostname with everything else, so ``IsPlatformAdmin`` is the whole
+        of the separation: it requires the caller to be platform staff acting on the
+        public schema, which a school's session never is.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this institución.
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedClientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedClientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedClientRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+          description: ''
+    delete:
+      operationId: tenants_destroy
+      description: 'Soft delete: the institution is deactivated but its schema and
+        data are preserved. Dropping the schema is a separate operational task.'
+      summary: Deactivate an institution
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this institución.
+        required: true
+      tags:
+      - tenants
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/users/:
+    get:
+      operationId: users_list
+      description: |-
+        Users of the current institution.
+
+        The queryset needs no tenant filter: the connection's ``search_path`` is
+        already pinned to this school's schema by ``TenantJWTAuthentication``, from
+        the caller's token.
+      summary: List users at this institution
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: language
+        schema:
+          type: string
+          title: Idioma preferido
+          enum:
+          - en
+          - es
+        description: |-
+          * `es` - Español
+          * `en` - Inglés
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+          title: Rol
+          enum:
+          - accountant
+          - coordinator
+          - guardian
+          - platform_admin
+          - school_admin
+          - student
+          - teacher
+        description: |-
+          * `platform_admin` - Administrador de la plataforma
+          * `school_admin` - Administrador del colegio
+          * `coordinator` - Coordinador académico
+          * `teacher` - Docente
+          * `student` - Estudiante
+          * `guardian` - Tutor
+          * `accountant` - Contador
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - users
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: users_create
+      description: |-
+        Users of the current institution.
+
+        The queryset needs no tenant filter: the connection's ``search_path`` is
+        already pinned to this school's schema by ``TenantJWTAuthentication``, from
+        the caller's token.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreate'
+          description: ''
+  /api/v1/users/{id}/:
+    get:
+      operationId: users_retrieve
+      description: |-
+        Users of the current institution.
+
+        The queryset needs no tenant filter: the connection's ``search_path`` is
+        already pinned to this school's schema by ``TenantJWTAuthentication``, from
+        the caller's token.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this usuario.
+        required: true
+      tags:
+      - users
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: users_update
+      description: |-
+        Users of the current institution.
+
+        The queryset needs no tenant filter: the connection's ``search_path`` is
+        already pinned to this school's schema by ``TenantJWTAuthentication``, from
+        the caller's token.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this usuario.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      description: |-
+        Users of the current institution.
+
+        The queryset needs no tenant filter: the connection's ``search_path`` is
+        already pinned to this school's schema by ``TenantJWTAuthentication``, from
+        the caller's token.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this usuario.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: users_destroy
+      description: Soft delete -- the row is retained and login is blocked.
+      summary: Deactivate a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this usuario.
+        required: true
+      tags:
+      - users
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/users/me/:
+    get:
+      operationId: users_me_retrieve
+      description: |-
+        Users of the current institution.
+
+        The queryset needs no tenant filter: the connection's ``search_path`` is
+        already pinned to this school's schema by ``TenantJWTAuthentication``, from
+        the caller's token.
+      summary: Current user
+      tags:
+      - users
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+    patch:
+      operationId: users_me_partial_update
+      description: |-
+        Users of the current institution.
+
+        The queryset needs no tenant filter: the connection's ``search_path`` is
+        already pinned to this school's schema by ``TenantJWTAuthentication``, from
+        the caller's token.
+      summary: Update current user
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMeRequest'
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+  /api/v1/users/me/change-password/:
+    post:
+      operationId: users_me_change_password_create
+      description: |-
+        Users of the current institution.
+
+        The queryset needs no tenant filter: the connection's ``search_path`` is
+        already pinned to this school's schema by ``TenantJWTAuthentication``, from
+        the caller's token.
+      summary: Change own password
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/users/roles/:
+    get:
+      operationId: users_roles_list
+      description: Localised role labels, rendered in the request's language. Only
+        roles the caller may actually assign are listed.
+      summary: Available roles
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: language
+        schema:
+          type: string
+          title: Idioma preferido
+          enum:
+          - en
+          - es
+        description: |-
+          * `es` - Español
+          * `en` - Inglés
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+          title: Rol
+          enum:
+          - accountant
+          - coordinator
+          - guardian
+          - platform_admin
+          - school_admin
+          - student
+          - teacher
+        description: |-
+          * `platform_admin` - Administrador de la plataforma
+          * `school_admin` - Administrador del colegio
+          * `coordinator` - Coordinador académico
+          * `teacher` - Docente
+          * `student` - Estudiante
+          * `guardian` - Tutor
+          * `accountant` - Contador
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - users
+      security:
+      - tenantJwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserRoleChoiceList'
+          description: ''
+components:
+  schemas:
+    AcademicYear:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          title: Nombre
+          maxLength: 64
+        start_date:
+          type: string
+          format: date
+          title: Fecha de inicio
+        end_date:
+          type: string
+          format: date
+          title: Fecha de fin
+        is_current:
+          type: boolean
+          title: Actual
+          description: Solo un año académico debe estar activo a la vez.
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Creado el
+      required:
+      - created_at
+      - end_date
+      - id
+      - is_active
+      - name
+      - start_date
+    AcademicYearRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 64
+        start_date:
+          type: string
+          format: date
+          title: Fecha de inicio
+        end_date:
+          type: string
+          format: date
+          title: Fecha de fin
+        is_current:
+          type: boolean
+          title: Actual
+          description: Solo un año académico debe estar activo a la vez.
+      required:
+      - end_date
+      - name
+      - start_date
+    Assessment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        subject:
+          type: string
+          format: uuid
+          title: Asignatura
+        subject_name:
+          type: string
+          readOnly: true
+        term:
+          type: string
+          format: uuid
+          title: Evaluation period
+        term_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          title: Nombre
+          maxLength: 200
+        max_score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          title: Maximum score
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          description: Relative to the other assessments in the same period.
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          title: Fecha de vencimiento
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+      required:
+      - id
+      - is_active
+      - name
+      - subject
+      - subject_name
+      - term
+      - term_name
+    AssessmentRequest:
+      type: object
+      properties:
+        subject:
+          type: string
+          format: uuid
+          title: Asignatura
+        term:
+          type: string
+          format: uuid
+          title: Evaluation period
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        max_score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          title: Maximum score
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          description: Relative to the other assessments in the same period.
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          title: Fecha de vencimiento
+      required:
+      - name
+      - subject
+      - term
+    AttendancePoint:
+      type: object
+      description: One day of the attendance trend.
+      properties:
+        date:
+          type: string
+          format: date
+          readOnly: true
+        value:
+          type: number
+          format: double
+          readOnly: true
+        recorded:
+          type: integer
+          readOnly: true
+      required:
+      - date
+      - recorded
+      - value
+    AttendanceStatusEnum:
+      enum:
+      - present
+      - late
+      - absent
+      - excused
+      type: string
+      description: |-
+        * `present` - Present
+        * `late` - Late
+        * `absent` - Absent
+        * `excused` - Excused
+    AvailableSchool:
+      type: object
+      description: One entry in "which schools can I sign in to", for the school switcher.
+      properties:
+        tenant_id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        schema:
+          type: string
+          readOnly: true
+        role:
+          type: string
+          readOnly: true
+        default_currency:
+          type: string
+          readOnly: true
+        brand_color:
+          type: string
+          readOnly: true
+        modules:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        is_current:
+          type: boolean
+          readOnly: true
+      required:
+      - brand_color
+      - default_currency
+      - is_current
+      - modules
+      - name
+      - role
+      - schema
+      - tenant_id
+    Branding:
+      type: object
+      description: The institution's public identity, for an unauthenticated caller.
+      properties:
+        name:
+          type: string
+          readOnly: true
+        schema:
+          type: string
+          readOnly: true
+        brand_color:
+          type: string
+          readOnly: true
+        default_language:
+          type: string
+          readOnly: true
+      required:
+      - brand_color
+      - default_language
+      - name
+      - schema
+    ChangePasswordRequest:
+      type: object
+      description: |-
+        Change your own password.
+
+        The credential lives in the public schema, on the person's
+        :class:`PlatformIdentity` -- the school-local row deliberately has an
+        unusable password so there is only ever one thing to change. Writing here
+        therefore changes the password at every school at once, which is what a
+        single credential means.
+
+        Platform operators have no identity: they are ordinary users of the public
+        schema, and the password on their row is the real one.
+      properties:
+        current_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - current_password
+      - new_password
+    ClassSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        slot:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Timetable entry
+        date:
+          type: string
+          format: date
+          readOnly: true
+          title: Fecha
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SessionStatusEnum'
+          readOnly: true
+          title: Estado
+        note:
+          type: string
+          readOnly: true
+        taken_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        taken_by_name:
+          type: string
+          readOnly: true
+        taken_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - date
+      - id
+      - note
+      - slot
+      - status
+      - taken_at
+      - taken_by
+      - taken_by_name
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          title: Nombre
+          maxLength: 200
+        legal_name:
+          type: string
+          title: Razón social
+          maxLength: 255
+        tax_id:
+          type: string
+          title: Identificación fiscal
+          maxLength: 50
+        schema_name:
+          type: string
+          maxLength: 63
+        default_language:
+          allOf:
+          - $ref: '#/components/schemas/DefaultLanguageEnum'
+          title: Idioma predeterminado
+        default_currency:
+          allOf:
+          - $ref: '#/components/schemas/DefaultCurrencyEnum'
+          description: |-
+            Currency used for every invoice issued by this institution.
+
+            * `MXN` - Mexican peso
+            * `USD` - US dollar
+        brand_color:
+          type: string
+          title: Brand colour
+          description: Six-digit hex. The rest of the palette is derived from it.
+          pattern: ^#[0-9a-fA-F]{6}$
+          maxLength: 7
+        disabled_modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisabledModulesEnum'
+          description: Modules switched off for this institution. Empty means all
+            are on.
+        enabled_modules:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        timezone:
+          type: string
+          title: Zona horaria
+          maxLength: 64
+        on_trial:
+          type: boolean
+          title: En periodo de prueba
+        paid_until:
+          type: string
+          format: date
+          nullable: true
+          title: Pagado hasta
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+        domains:
+          type: array
+          items:
+            $ref: '#/components/schemas/Domain'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Creado el
+      required:
+      - created_at
+      - domains
+      - enabled_modules
+      - id
+      - is_active
+      - name
+      - schema_name
+    ClientProvision:
+      type: object
+      description: |-
+        Input for onboarding a school: a name and some preferences.
+
+        Neither a hostname nor a schema name is asked for. One domain serves the
+        whole platform, so a school is not reached at an address of its own -- it is
+        selected by whoever signs in. And the Postgres schema is an implementation
+        detail of how the data is isolated, not a decision an operator opening a new
+        institution should have to make; it is derived from the name and reported
+        back read-only.
+      properties:
+        name:
+          type: string
+          title: Nombre
+          maxLength: 200
+        legal_name:
+          type: string
+          title: Razón social
+          maxLength: 255
+        tax_id:
+          type: string
+          title: Identificación fiscal
+          maxLength: 50
+        schema_name:
+          type: string
+          readOnly: true
+        default_language:
+          allOf:
+          - $ref: '#/components/schemas/DefaultLanguageEnum'
+          title: Idioma predeterminado
+        default_currency:
+          allOf:
+          - $ref: '#/components/schemas/DefaultCurrencyEnum'
+          description: |-
+            Currency used for every invoice issued by this institution.
+
+            * `MXN` - Mexican peso
+            * `USD` - US dollar
+        brand_color:
+          type: string
+          title: Brand colour
+          description: Six-digit hex. The rest of the palette is derived from it.
+          pattern: ^#[0-9a-fA-F]{6}$
+          maxLength: 7
+        timezone:
+          type: string
+          title: Zona horaria
+          maxLength: 64
+      required:
+      - name
+      - schema_name
+    ClientProvisionRequest:
+      type: object
+      description: |-
+        Input for onboarding a school: a name and some preferences.
+
+        Neither a hostname nor a schema name is asked for. One domain serves the
+        whole platform, so a school is not reached at an address of its own -- it is
+        selected by whoever signs in. And the Postgres schema is an implementation
+        detail of how the data is isolated, not a decision an operator opening a new
+        institution should have to make; it is derived from the name and reported
+        back read-only.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        legal_name:
+          type: string
+          title: Razón social
+          maxLength: 255
+        tax_id:
+          type: string
+          title: Identificación fiscal
+          maxLength: 50
+        default_language:
+          allOf:
+          - $ref: '#/components/schemas/DefaultLanguageEnum'
+          title: Idioma predeterminado
+        default_currency:
+          allOf:
+          - $ref: '#/components/schemas/DefaultCurrencyEnum'
+          description: |-
+            Currency used for every invoice issued by this institution.
+
+            * `MXN` - Mexican peso
+            * `USD` - US dollar
+        brand_color:
+          type: string
+          minLength: 1
+          title: Brand colour
+          description: Six-digit hex. The rest of the palette is derived from it.
+          pattern: ^#[0-9a-fA-F]{6}$
+          maxLength: 7
+        timezone:
+          type: string
+          minLength: 1
+          title: Zona horaria
+          maxLength: 64
+      required:
+      - name
+    ClientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        legal_name:
+          type: string
+          title: Razón social
+          maxLength: 255
+        tax_id:
+          type: string
+          title: Identificación fiscal
+          maxLength: 50
+        schema_name:
+          type: string
+          minLength: 1
+          maxLength: 63
+        default_language:
+          allOf:
+          - $ref: '#/components/schemas/DefaultLanguageEnum'
+          title: Idioma predeterminado
+        default_currency:
+          allOf:
+          - $ref: '#/components/schemas/DefaultCurrencyEnum'
+          description: |-
+            Currency used for every invoice issued by this institution.
+
+            * `MXN` - Mexican peso
+            * `USD` - US dollar
+        brand_color:
+          type: string
+          minLength: 1
+          title: Brand colour
+          description: Six-digit hex. The rest of the palette is derived from it.
+          pattern: ^#[0-9a-fA-F]{6}$
+          maxLength: 7
+        disabled_modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisabledModulesEnum'
+          description: Modules switched off for this institution. Empty means all
+            are on.
+        timezone:
+          type: string
+          minLength: 1
+          title: Zona horaria
+          maxLength: 64
+        on_trial:
+          type: boolean
+          title: En periodo de prueba
+        paid_until:
+          type: string
+          format: date
+          nullable: true
+          title: Pagado hasta
+      required:
+      - name
+      - schema_name
+    CurrencyEnum:
+      enum:
+      - MXN
+      - USD
+      type: string
+      description: |-
+        * `MXN` - Mexican peso
+        * `USD` - US dollar
+    DefaultCurrencyEnum:
+      enum:
+      - MXN
+      - USD
+      type: string
+      description: |-
+        * `MXN` - Mexican peso
+        * `USD` - US dollar
+    DefaultLanguageEnum:
+      enum:
+      - es
+      - en
+      type: string
+      description: |-
+        * `es` - Español
+        * `en` - Inglés
+    DisabledModulesEnum:
+      enum:
+      - users
+      - academic
+      - subjects
+      - grades
+      - billing
+      - schedule
+      - attendance
+      type: string
+      description: |-
+        * `users` - Usuarios
+        * `academic` - Académico
+        * `subjects` - Subjects
+        * `grades` - Gradebook
+        * `billing` - Facturación
+        * `schedule` - Schedule
+        * `attendance` - Attendance
+    Domain:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        domain:
+          type: string
+          maxLength: 253
+        is_primary:
+          type: boolean
+      required:
+      - domain
+      - id
+    DomainRequest:
+      type: object
+      properties:
+        domain:
+          type: string
+          minLength: 1
+          maxLength: 253
+        is_primary:
+          type: boolean
+      required:
+      - domain
+    Enrollment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        student:
+          type: string
+          format: uuid
+          title: Estudiante
+        student_name:
+          type: string
+          readOnly: true
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        program_name:
+          type: string
+          readOnly: true
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        academic_year_name:
+          type: string
+          readOnly: true
+        group:
+          type: string
+          format: uuid
+          nullable: true
+          title: Grupo
+        group_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EnrollmentStatusEnum'
+          title: Estado
+        enrolled_on:
+          type: string
+          format: date
+          title: Matriculado el
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+      required:
+      - academic_year
+      - academic_year_name
+      - enrolled_on
+      - group_name
+      - id
+      - is_active
+      - program
+      - program_name
+      - student
+      - student_name
+    EnrollmentRequest:
+      type: object
+      properties:
+        student:
+          type: string
+          format: uuid
+          title: Estudiante
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        group:
+          type: string
+          format: uuid
+          nullable: true
+          title: Grupo
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EnrollmentStatusEnum'
+          title: Estado
+        enrolled_on:
+          type: string
+          format: date
+          title: Matriculado el
+      required:
+      - academic_year
+      - enrolled_on
+      - program
+      - student
+    EnrollmentStatusEnum:
+      enum:
+      - pending
+      - active
+      - withdrawn
+      - completed
+      type: string
+      description: |-
+        * `pending` - Pendiente
+        * `active` - Activa
+        * `withdrawn` - Retirada
+        * `completed` - Completada
+    Grade:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        assessment:
+          type: string
+          format: uuid
+          readOnly: true
+        enrollment:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Matrícula
+        student_name:
+          type: string
+          readOnly: true
+        score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        comment:
+          type: string
+          readOnly: true
+        recorded_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+          title: Registrado por
+        recorded_by_name:
+          type: string
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Actualizado el
+      required:
+      - assessment
+      - comment
+      - enrollment
+      - id
+      - recorded_by
+      - recorded_by_name
+      - score
+      - student_name
+      - updated_at
+    GradeInputRequest:
+      type: object
+      description: One cell of the gradebook, as the bulk endpoint receives it.
+      properties:
+        enrollment_id:
+          type: string
+          format: uuid
+        score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          nullable: true
+        comment:
+          type: string
+          maxLength: 300
+      required:
+      - enrollment_id
+      - score
+    Gradebook:
+      type: object
+      description: 'The whole grid: the assessments across the top, the students down.'
+      properties:
+        subject:
+          type: string
+          format: uuid
+          readOnly: true
+        term:
+          type: string
+          format: uuid
+          readOnly: true
+        assessments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Assessment'
+          readOnly: true
+        average_scale:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/GradebookRow'
+          readOnly: true
+        can_edit:
+          type: boolean
+          readOnly: true
+      required:
+      - assessments
+      - average_scale
+      - can_edit
+      - rows
+      - subject
+      - term
+    GradebookRow:
+      type: object
+      properties:
+        enrollment_id:
+          type: string
+          format: uuid
+          readOnly: true
+        student_id:
+          type: string
+          format: uuid
+          readOnly: true
+        student_name:
+          type: string
+          readOnly: true
+        scores:
+          type: object
+          additionalProperties:
+            type: string
+            format: decimal
+            pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        average:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        graded_count:
+          type: integer
+          readOnly: true
+      required:
+      - average
+      - enrollment_id
+      - graded_count
+      - scores
+      - student_id
+      - student_name
+    Health:
+      type: object
+      description: Response schema for the health probe.
+      properties:
+        status:
+          type: string
+          readOnly: true
+        schema:
+          type: string
+          readOnly: true
+        language:
+          type: string
+          readOnly: true
+        available_languages:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - available_languages
+      - language
+      - schema
+      - status
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+          title: Número de factura
+        enrollment_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: ID de matrícula
+          description: Referencia a la matrícula de apps.academic. Se resuelve mediante
+            servicios.
+        student_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: ID de estudiante
+        program_id:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+          title: ID de programa
+        student_name_snapshot:
+          type: string
+          readOnly: true
+          title: Nombre del estudiante
+        program_name_snapshot:
+          type: string
+          readOnly: true
+          title: Nombre del programa
+        status:
+          allOf:
+          - $ref: '#/components/schemas/InvoiceStatusEnum'
+          readOnly: true
+          title: Estado
+        currency:
+          type: string
+          readOnly: true
+          title: Moneda
+        issue_date:
+          type: string
+          format: date
+          readOnly: true
+          title: Fecha de emisión
+        due_date:
+          type: string
+          format: date
+          readOnly: true
+          title: Fecha de vencimiento
+        notes:
+          type: string
+          readOnly: true
+          title: Notas
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        amount_paid:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceLine'
+          readOnly: true
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Creado el
+      required:
+      - amount_paid
+      - balance
+      - created_at
+      - currency
+      - due_date
+      - enrollment_id
+      - id
+      - is_active
+      - issue_date
+      - lines
+      - notes
+      - number
+      - payments
+      - program_id
+      - program_name_snapshot
+      - status
+      - student_id
+      - student_name_snapshot
+      - subtotal
+    InvoiceCreateRequest:
+      type: object
+      description: |-
+        Input for ``POST /api/v1/billing/invoices/``.
+
+        ``enrollment_id`` is a bare UUID rather than a related field: billing has no
+        ForeignKey into the academic context (rule A.2), so DRF cannot and must not
+        validate it against a queryset. The service layer validates it instead.
+      properties:
+        enrollment_id:
+          type: string
+          format: uuid
+          description: UUID de una matrícula en el contexto académico.
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceLineInputRequest'
+        issue_date:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        currency:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CurrencyEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        notes:
+          type: string
+          default: ''
+      required:
+      - enrollment_id
+      - lines
+    InvoiceLine:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        concept_id:
+          type: string
+          format: uuid
+          nullable: true
+          title: ID de concepto
+        description:
+          type: string
+          title: Descripción
+          maxLength: 300
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          title: Cantidad
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Precio unitario
+        line_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - description
+      - id
+      - line_total
+      - unit_price
+    InvoiceLineInputRequest:
+      type: object
+      properties:
+        concept_id:
+          type: string
+          format: uuid
+          nullable: true
+        description:
+          type: string
+          minLength: 1
+          maxLength: 300
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          default: '1.00'
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - description
+      - unit_price
+    InvoiceLineRequest:
+      type: object
+      properties:
+        concept_id:
+          type: string
+          format: uuid
+          nullable: true
+          title: ID de concepto
+        description:
+          type: string
+          minLength: 1
+          title: Descripción
+          maxLength: 300
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          title: Cantidad
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Precio unitario
+      required:
+      - description
+      - unit_price
+    InvoiceStatusEnum:
+      enum:
+      - draft
+      - issued
+      - partially_paid
+      - paid
+      - overdue
+      - cancelled
+      type: string
+      description: |-
+        * `draft` - Borrador
+        * `issued` - Emitida
+        * `partially_paid` - Parcialmente pagada
+        * `paid` - Pagada
+        * `overdue` - Vencida
+        * `cancelled` - Cancelada
+    LanguageEnum:
+      enum:
+      - es
+      - en
+      type: string
+      description: |-
+        * `es` - Español
+        * `en` - Inglés
+    LoginRequest:
+      type: object
+      description: |-
+        Email and password, resolved into a person and the school they enter.
+
+        Two kinds of account sign in here and the order is deliberate. Most people
+        are a :class:`PlatformIdentity` -- one credential, one or more schools.
+        Platform operators are ordinary users of the public schema with no identity
+        at all, and are tried second, so an operator who also works at a school gets
+        their school account rather than silently landing in the console.
+      properties:
+        email:
+          type: string
+          format: email
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    LogoutRequest:
+      type: object
+      description: Blacklists a refresh token so it cannot be exchanged again.
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - refresh
+    Me:
+      type: object
+      description: The authenticated user's own record -- role is read-only here.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Correo electrónico
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          readOnly: true
+          title: Rol
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+        permissions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - email
+      - first_name
+      - full_name
+      - id
+      - last_name
+      - permissions
+      - role
+    Membership:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+          title: Institución
+        tenant_name:
+          type: string
+          readOnly: true
+        tenant_schema:
+          type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Rol
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+      required:
+      - id
+      - is_active
+      - tenant
+      - tenant_name
+      - tenant_schema
+    MembershipRequest:
+      type: object
+      properties:
+        tenant:
+          type: string
+          format: uuid
+          title: Institución
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Rol
+      required:
+      - tenant
+    MethodEnum:
+      enum:
+      - cash
+      - card
+      - transfer
+      - cheque
+      type: string
+      description: |-
+        * `cash` - Efectivo
+        * `card` - Tarjeta
+        * `transfer` - Transferencia bancaria
+        * `cheque` - Cheque
+    NullEnum:
+      enum:
+      - null
+    PaginatedAcademicYearList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AcademicYear'
+    PaginatedAssessmentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Assessment'
+    PaginatedClientList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Client'
+    PaginatedEnrollmentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Enrollment'
+    PaginatedInvoiceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+    PaginatedPlatformIdentityList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlatformIdentity'
+    PaginatedProgramList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Program'
+    PaginatedStudentGroupList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentGroup'
+    PaginatedSubjectList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subject'
+    PaginatedTermList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Term'
+    PaginatedTimetableSlotList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimetableSlot'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PaginatedUserRoleChoiceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRoleChoice'
+    PatchedAcademicYearRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 64
+        start_date:
+          type: string
+          format: date
+          title: Fecha de inicio
+        end_date:
+          type: string
+          format: date
+          title: Fecha de fin
+        is_current:
+          type: boolean
+          title: Actual
+          description: Solo un año académico debe estar activo a la vez.
+    PatchedAssessmentRequest:
+      type: object
+      properties:
+        subject:
+          type: string
+          format: uuid
+          title: Asignatura
+        term:
+          type: string
+          format: uuid
+          title: Evaluation period
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        max_score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          title: Maximum score
+        weight:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          description: Relative to the other assessments in the same period.
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          title: Fecha de vencimiento
+    PatchedClientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        legal_name:
+          type: string
+          title: Razón social
+          maxLength: 255
+        tax_id:
+          type: string
+          title: Identificación fiscal
+          maxLength: 50
+        schema_name:
+          type: string
+          minLength: 1
+          maxLength: 63
+        default_language:
+          allOf:
+          - $ref: '#/components/schemas/DefaultLanguageEnum'
+          title: Idioma predeterminado
+        default_currency:
+          allOf:
+          - $ref: '#/components/schemas/DefaultCurrencyEnum'
+          description: |-
+            Currency used for every invoice issued by this institution.
+
+            * `MXN` - Mexican peso
+            * `USD` - US dollar
+        brand_color:
+          type: string
+          minLength: 1
+          title: Brand colour
+          description: Six-digit hex. The rest of the palette is derived from it.
+          pattern: ^#[0-9a-fA-F]{6}$
+          maxLength: 7
+        disabled_modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisabledModulesEnum'
+          description: Modules switched off for this institution. Empty means all
+            are on.
+        timezone:
+          type: string
+          minLength: 1
+          title: Zona horaria
+          maxLength: 64
+        on_trial:
+          type: boolean
+          title: En periodo de prueba
+        paid_until:
+          type: string
+          format: date
+          nullable: true
+          title: Pagado hasta
+    PatchedEnrollmentRequest:
+      type: object
+      properties:
+        student:
+          type: string
+          format: uuid
+          title: Estudiante
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        group:
+          type: string
+          format: uuid
+          nullable: true
+          title: Grupo
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EnrollmentStatusEnum'
+          title: Estado
+        enrolled_on:
+          type: string
+          format: date
+          title: Matriculado el
+    PatchedMeRequest:
+      type: object
+      description: The authenticated user's own record -- role is read-only here.
+      properties:
+        first_name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+    PatchedPlatformIdentityRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+    PatchedProgramRequest:
+      type: object
+      description: |-
+        ``name``/``description`` resolve to the request's active language.
+
+        modeltranslation swaps in the column for the active locale, so clients get
+        ``name`` already localised and never see ``name_es`` / ``name_en``.
+      properties:
+        code:
+          type: string
+          minLength: 1
+          title: Código
+          maxLength: 32
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        description:
+          type: string
+          title: Descripción
+    PatchedStudentGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 64
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        tutor:
+          type: string
+          format: uuid
+          nullable: true
+        room:
+          type: string
+          title: Home room
+          description: Where the group is by default. A timetable entry may override
+            it.
+          maxLength: 64
+    PatchedSubjectRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          title: Código
+          maxLength: 32
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        description:
+          type: string
+          title: Descripción
+        credits:
+          type: integer
+          maximum: 100
+          minimum: 1
+          title: Créditos
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        teacher:
+          type: string
+          format: uuid
+          nullable: true
+          title: Docente
+    PatchedTermRequest:
+      type: object
+      properties:
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 64
+        ordinal:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Position
+          description: Order within the year. Report cards are printed in this order.
+        start_date:
+          type: string
+          format: date
+          title: Fecha de inicio
+        end_date:
+          type: string
+          format: date
+          title: Fecha de fin
+        is_current:
+          type: boolean
+          title: Actual
+          description: The period the gradebook opens on.
+    PatchedTimetableSlotRequest:
+      type: object
+      properties:
+        group:
+          type: string
+          format: uuid
+          title: Grupo
+        subject:
+          type: string
+          format: uuid
+          title: Asignatura
+        weekday:
+          allOf:
+          - $ref: '#/components/schemas/WeekdayEnum'
+          minimum: 0
+          maximum: 32767
+        start_time:
+          type: string
+          format: time
+          title: Starts at
+        end_time:
+          type: string
+          format: time
+          title: Ends at
+        room:
+          type: string
+          maxLength: 64
+    PatchedUserRequest:
+      type: object
+      description: |-
+        Nobody may hand out a role at or above their own.
+
+        This is the hierarchy's teeth. Without it the users endpoint would let
+        anyone with write access appoint a school administrator -- or a platform
+        operator -- and the ladder would describe the interface rather than
+        constrain it.
+
+        A peer role is withheld along with the ones above: granting it is
+        indistinguishable from self-promotion the moment the appointee returns the
+        favour.
+
+        Requests with no acting user fall back to refusing everything above a school
+        administrator, which is the case for the operator console creating a
+        school's first administrator.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Rol
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        invoice:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Factura
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Importe
+        method:
+          allOf:
+          - $ref: '#/components/schemas/MethodEnum'
+          title: Método
+        reference:
+          type: string
+          title: Referencia
+          maxLength: 120
+        received_on:
+          type: string
+          format: date
+          title: Recibido el
+        recorded_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+          title: Registrado por
+        recorded_by_name:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Creado el
+      required:
+      - amount
+      - created_at
+      - id
+      - invoice
+      - received_on
+      - recorded_by
+      - recorded_by_name
+    PaymentCreateRequest:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        method:
+          allOf:
+          - $ref: '#/components/schemas/MethodEnum'
+          default: transfer
+        reference:
+          type: string
+          default: ''
+          maxLength: 120
+        received_on:
+          type: string
+          format: date
+      required:
+      - amount
+    PaymentRequest:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Importe
+        method:
+          allOf:
+          - $ref: '#/components/schemas/MethodEnum'
+          title: Método
+        reference:
+          type: string
+          title: Referencia
+          maxLength: 120
+        received_on:
+          type: string
+          format: date
+          title: Recibido el
+      required:
+      - amount
+      - received_on
+    PlatformIdentity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/Membership'
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Último inicio de sesión
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Creado el
+      required:
+      - created_at
+      - email
+      - first_name
+      - full_name
+      - id
+      - is_active
+      - last_login
+      - last_name
+      - memberships
+    PlatformIdentityCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+      required:
+      - email
+      - first_name
+      - last_name
+    PlatformIdentityCreateRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+    PlatformIdentityRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+      required:
+      - email
+      - first_name
+      - last_name
+    Program:
+      type: object
+      description: |-
+        ``name``/``description`` resolve to the request's active language.
+
+        modeltranslation swaps in the column for the active locale, so clients get
+        ``name`` already localised and never see ``name_es`` / ``name_en``.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          title: Código
+          maxLength: 32
+        name:
+          type: string
+          title: Nombre
+          maxLength: 200
+        description:
+          type: string
+          title: Descripción
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Creado el
+      required:
+      - code
+      - created_at
+      - id
+      - is_active
+      - name
+    ProgramRequest:
+      type: object
+      description: |-
+        ``name``/``description`` resolve to the request's active language.
+
+        modeltranslation swaps in the column for the active locale, so clients get
+        ``name`` already localised and never see ``name_es`` / ``name_en``.
+      properties:
+        code:
+          type: string
+          minLength: 1
+          title: Código
+          maxLength: 32
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        description:
+          type: string
+          title: Descripción
+      required:
+      - code
+      - name
+    Roll:
+      type: object
+      description: 'A register: the class, the date, and everyone who should be in
+        the room.'
+      properties:
+        slot:
+          allOf:
+          - $ref: '#/components/schemas/TimetableSlot'
+          readOnly: true
+        date:
+          type: string
+          format: date
+          readOnly: true
+        session:
+          allOf:
+          - $ref: '#/components/schemas/ClassSession'
+          readOnly: true
+          nullable: true
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/RollRow'
+          readOnly: true
+        can_edit:
+          type: boolean
+          readOnly: true
+      required:
+      - can_edit
+      - date
+      - rows
+      - session
+      - slot
+    RollEntryRequest:
+      type: object
+      description: One student's mark, as the register is submitted.
+      properties:
+        enrollment_id:
+          type: string
+          format: uuid
+        status:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/AttendanceStatusEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        note:
+          type: string
+          maxLength: 300
+      required:
+      - enrollment_id
+      - status
+    RollInputRequest:
+      type: object
+      description: 'Taking the roll: the whole room in one call.'
+      properties:
+        slot:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SessionStatusEnum'
+          default: held
+        note:
+          type: string
+          maxLength: 300
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/RollEntryRequest'
+      required:
+      - date
+      - slot
+    RollRow:
+      type: object
+      properties:
+        enrollment_id:
+          type: string
+          format: uuid
+          readOnly: true
+        student_id:
+          type: string
+          format: uuid
+          readOnly: true
+        student_name:
+          type: string
+          readOnly: true
+        status:
+          readOnly: true
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/AttendanceStatusEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        note:
+          type: string
+          readOnly: true
+      required:
+      - enrollment_id
+      - note
+      - status
+      - student_id
+      - student_name
+    SessionStatusEnum:
+      enum:
+      - held
+      - cancelled
+      type: string
+      description: |-
+        * `held` - Held
+        * `cancelled` - Cancelada
+    SetIdentityPasswordRequest:
+      type: object
+      description: |-
+        Operator-initiated password reset.
+
+        Unlike a school's user endpoint -- where only the account owner may change a
+        password -- this one exists because the platform operator is the recovery
+        path when someone is locked out of every school at once.
+      properties:
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - new_password
+    StudentGroup:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          title: Nombre
+          maxLength: 64
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        program_code:
+          type: string
+          readOnly: true
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        academic_year_name:
+          type: string
+          readOnly: true
+        tutor:
+          type: string
+          format: uuid
+          nullable: true
+        tutor_name:
+          type: string
+          readOnly: true
+        room:
+          type: string
+          title: Home room
+          description: Where the group is by default. A timetable entry may override
+            it.
+          maxLength: 64
+        student_count:
+          type: integer
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+      required:
+      - academic_year
+      - academic_year_name
+      - id
+      - is_active
+      - name
+      - program
+      - program_code
+      - student_count
+      - tutor_name
+    StudentGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 64
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        tutor:
+          type: string
+          format: uuid
+          nullable: true
+        room:
+          type: string
+          title: Home room
+          description: Where the group is by default. A timetable entry may override
+            it.
+          maxLength: 64
+      required:
+      - academic_year
+      - name
+      - program
+    Subject:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          title: Código
+          maxLength: 32
+        name:
+          type: string
+          title: Nombre
+          maxLength: 200
+        description:
+          type: string
+          title: Descripción
+        credits:
+          type: integer
+          maximum: 100
+          minimum: 1
+          title: Créditos
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        program_code:
+          type: string
+          readOnly: true
+        teacher:
+          type: string
+          format: uuid
+          nullable: true
+          title: Docente
+        teacher_name:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+      required:
+      - code
+      - id
+      - is_active
+      - name
+      - program
+      - program_code
+      - teacher_name
+    SubjectRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          title: Código
+          maxLength: 32
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 200
+        description:
+          type: string
+          title: Descripción
+        credits:
+          type: integer
+          maximum: 100
+          minimum: 1
+          title: Créditos
+        program:
+          type: string
+          format: uuid
+          title: Programa
+        teacher:
+          type: string
+          format: uuid
+          nullable: true
+          title: Docente
+      required:
+      - code
+      - name
+      - program
+    SwitchSchoolRequest:
+      type: object
+      description: |-
+        Move an existing session to another of the person's schools.
+
+        A re-issue rather than a fresh login. It used to be a navigation to another
+        hostname, which meant signing in again; with one domain the session stays
+        put and only the tenant claim changes.
+      properties:
+        tenant_id:
+          type: string
+          format: uuid
+      required:
+      - tenant_id
+    Term:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        academic_year_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          title: Nombre
+          maxLength: 64
+        ordinal:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Position
+          description: Order within the year. Report cards are printed in this order.
+        start_date:
+          type: string
+          format: date
+          title: Fecha de inicio
+        end_date:
+          type: string
+          format: date
+          title: Fecha de fin
+        is_current:
+          type: boolean
+          title: Actual
+          description: The period the gradebook opens on.
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+      required:
+      - academic_year
+      - academic_year_name
+      - end_date
+      - id
+      - is_active
+      - name
+      - start_date
+    TermRequest:
+      type: object
+      properties:
+        academic_year:
+          type: string
+          format: uuid
+          title: Año académico
+        name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 64
+        ordinal:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          title: Position
+          description: Order within the year. Report cards are printed in this order.
+        start_date:
+          type: string
+          format: date
+          title: Fecha de inicio
+        end_date:
+          type: string
+          format: date
+          title: Fecha de fin
+        is_current:
+          type: boolean
+          title: Actual
+          description: The period the gradebook opens on.
+      required:
+      - academic_year
+      - end_date
+      - name
+      - start_date
+    TimetableSlot:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        group:
+          type: string
+          format: uuid
+          title: Grupo
+        group_name:
+          type: string
+          readOnly: true
+        subject:
+          type: string
+          format: uuid
+          title: Asignatura
+        subject_name:
+          type: string
+          readOnly: true
+        subject_code:
+          type: string
+          readOnly: true
+        teacher_name:
+          type: string
+          readOnly: true
+        weekday:
+          allOf:
+          - $ref: '#/components/schemas/WeekdayEnum'
+          minimum: 0
+          maximum: 32767
+        start_time:
+          type: string
+          format: time
+          title: Starts at
+        end_time:
+          type: string
+          format: time
+          title: Ends at
+        room:
+          type: string
+          maxLength: 64
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+      required:
+      - end_time
+      - group
+      - group_name
+      - id
+      - is_active
+      - start_time
+      - subject
+      - subject_code
+      - subject_name
+      - teacher_name
+      - weekday
+    TimetableSlotRequest:
+      type: object
+      properties:
+        group:
+          type: string
+          format: uuid
+          title: Grupo
+        subject:
+          type: string
+          format: uuid
+          title: Asignatura
+        weekday:
+          allOf:
+          - $ref: '#/components/schemas/WeekdayEnum'
+          minimum: 0
+          maximum: 32767
+        start_time:
+          type: string
+          format: time
+          title: Starts at
+        end_time:
+          type: string
+          format: time
+          title: Ends at
+        room:
+          type: string
+          maxLength: 64
+      required:
+      - end_time
+      - group
+      - start_time
+      - subject
+      - weekday
+    TokenVerifyRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - token
+    User:
+      type: object
+      description: |-
+        Nobody may hand out a role at or above their own.
+
+        This is the hierarchy's teeth. Without it the users endpoint would let
+        anyone with write access appoint a school administrator -- or a platform
+        operator -- and the ladder would describe the interface rather than
+        constrain it.
+
+        A peer role is withheld along with the ones above: granting it is
+        indistinguishable from self-promotion the moment the appointee returns the
+        favour.
+
+        Requests with no acting user fall back to refusing everything above a school
+        administrator, which is the case for the operator console creating a
+        school's first administrator.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Rol
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Activo
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de alta
+      required:
+      - date_joined
+      - email
+      - first_name
+      - full_name
+      - id
+      - is_active
+      - last_name
+    UserCreate:
+      type: object
+      description: |-
+        Nobody may hand out a role at or above their own.
+
+        This is the hierarchy's teeth. Without it the users endpoint would let
+        anyone with write access appoint a school administrator -- or a platform
+        operator -- and the ladder would describe the interface rather than
+        constrain it.
+
+        A peer role is withheld along with the ones above: granting it is
+        indistinguishable from self-promotion the moment the appointee returns the
+        favour.
+
+        Requests with no acting user fall back to refusing everything above a school
+        administrator, which is the case for the operator console creating a
+        school's first administrator.
+      properties:
+        email:
+          type: string
+          format: email
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Rol
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+      required:
+      - email
+      - first_name
+      - last_name
+    UserCreateRequest:
+      type: object
+      description: |-
+        Nobody may hand out a role at or above their own.
+
+        This is the hierarchy's teeth. Without it the users endpoint would let
+        anyone with write access appoint a school administrator -- or a platform
+        operator -- and the ladder would describe the interface rather than
+        constrain it.
+
+        A peer role is withheld along with the ones above: granting it is
+        indistinguishable from self-promotion the moment the appointee returns the
+        favour.
+
+        Requests with no acting user fall back to refusing everything above a school
+        administrator, which is the case for the operator console creating a
+        school's first administrator.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Rol
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+    UserRequest:
+      type: object
+      description: |-
+        Nobody may hand out a role at or above their own.
+
+        This is the hierarchy's teeth. Without it the users endpoint would let
+        anyone with write access appoint a school administrator -- or a platform
+        operator -- and the ladder would describe the interface rather than
+        constrain it.
+
+        A peer role is withheld along with the ones above: granting it is
+        indistinguishable from self-promotion the moment the appointee returns the
+        favour.
+
+        Requests with no acting user fall back to refusing everything above a school
+        administrator, which is the case for the operator console creating a
+        school's first administrator.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Correo electrónico
+          maxLength: 254
+        first_name:
+          type: string
+          minLength: 1
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          minLength: 1
+          title: Apellidos
+          maxLength: 150
+        phone:
+          type: string
+          title: Teléfono
+          maxLength: 32
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          title: Rol
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          title: Idioma preferido
+      required:
+      - email
+      - first_name
+      - last_name
+    UserRoleChoice:
+      type: object
+      description: Localised role list so the frontend does not hardcode labels.
+      properties:
+        value:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          readOnly: true
+        label:
+          type: string
+          readOnly: true
+      required:
+      - label
+      - value
+    UserRoleEnum:
+      enum:
+      - platform_admin
+      - school_admin
+      - coordinator
+      - teacher
+      - student
+      - guardian
+      - accountant
+      type: string
+      description: |-
+        * `platform_admin` - Administrador de la plataforma
+        * `school_admin` - Administrador del colegio
+        * `coordinator` - Coordinador académico
+        * `teacher` - Docente
+        * `student` - Estudiante
+        * `guardian` - Tutor
+        * `accountant` - Contador
+    WeekdayEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      type: integer
+      description: |-
+        * `1` - lunes
+        * `2` - martes
+        * `3` - miércoles
+        * `4` - jueves
+        * `5` - viernes
+        * `6` - sábado
+        * `7` - domingo
+  securitySchemes:
+    tenantJwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'JWT access token issued by `POST /api/v1/auth/login/`. The token
+        is bound to the institution whose host issued it: presenting it to a different
+        institution''s host is rejected with 403 `tenant_mismatch`.'

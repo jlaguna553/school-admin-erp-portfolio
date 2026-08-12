@@ -1,0 +1,41 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "stream",
+  "globalEnv": ["NODE_ENV"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      // Turborepo runs tasks in a sanitised environment: anything not declared
+      // here is stripped before the task sees it, however it was set on the
+      // host. Omitting API_PROXY_TARGET meant Vercel had it configured, Turbo
+      // removed it, and Next built with no /api rewrite -- deploying green and
+      // unable to reach the backend.
+      //
+      // These belong in `env` rather than `passThroughEnv` because each one
+      // changes the build output, so each must take part in the cache key. A
+      // build made for one API target must not be reused for another.
+      "env": [
+        "API_PROXY_TARGET",
+        "NEXT_PUBLIC_API_PORT",
+        "NEXT_PUBLIC_API_ORIGIN",
+        "NEXT_OUTPUT",
+        "VERCEL"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "generate": {
+      "cache": false,
+      "outputs": ["src/**"]
+    }
+  }
+}

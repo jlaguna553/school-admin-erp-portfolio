@@ -1,0 +1,14 @@
+from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
+
+
+class AuthenticationConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.authentication"
+    label = "authentication"
+    verbose_name = _("Authentication")
+
+    def ready(self) -> None:
+        # Registers the drf-spectacular security scheme for
+        # TenantJWTAuthentication. Import for side effects only.
+        from . import schema  # noqa: F401

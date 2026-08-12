@@ -1,0 +1,185 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens — see docs/design-system.md for the source contract.
+ *
+ * Every value is semantic: components reference `bg-card` / `text-muted-foreground`,
+ * never a hex or a raw palette step. Rebranding is therefore a change to this
+ * file alone (per the "single swappable token" decision).
+ *
+ * Dark mode is *selected*, not an automatic inversion of light — the chart
+ * series in particular gets its own step, because the light blue only reaches
+ * 2.6:1 against the dark surface (below the 3:1 floor).
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Surfaces & ink */
+  --background: #f1f4f8;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #1d4ed8;
+
+  /* Brand */
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --accent: #eff4ff;
+  --accent-foreground: #1d4ed8;
+
+  /* Sidebar (its own surface — the reference uses deep navy) */
+  --sidebar: #12325b;
+  --sidebar-foreground: #e8eef6;
+  --sidebar-muted: #9db2cf;
+  --sidebar-accent: rgb(255 255 255 / 0.1);
+  --sidebar-border: rgb(255 255 255 / 0.08);
+
+  /* Status — reserved, never reused as a chart series */
+  --success: #15803d;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --info: #1d4ed8;
+  --info-foreground: #ffffff;
+
+  /* Chart series. Validated for light surfaces (lightness band, chroma floor,
+     >= 3:1 contrast). Slots are assigned in fixed order and never cycled. */
+  --chart-1: #1d4ed8;
+  --chart-2: #0f766e;
+  --chart-3: #a16207;
+  --chart-4: #7e22ce;
+  --chart-grid: #eef1f5;
+
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: #0b1220;
+  --foreground: #f3f4f6;
+  --card: #111a2b;
+  --card-foreground: #f3f4f6;
+  --muted: #1a2436;
+  --muted-foreground: #9aa6b8;
+  --border: #1f2a3d;
+  --input: #1f2a3d;
+  --ring: #3b82f6;
+
+  --primary: #3b82f6;
+  --primary-foreground: #06101f;
+  --accent: #17253c;
+  --accent-foreground: #93c5fd;
+
+  --sidebar: #081120;
+  --sidebar-foreground: #e8eef6;
+  --sidebar-muted: #7f93ae;
+  --sidebar-accent: rgb(255 255 255 / 0.08);
+  --sidebar-border: rgb(255 255 255 / 0.06);
+
+  --success: #22c55e;
+  --success-foreground: #052e16;
+  --warning: #f59e0b;
+  --warning-foreground: #1c1204;
+  --destructive: #ef4444;
+  --destructive-foreground: #1f0606;
+  --info: #3b82f6;
+  --info-foreground: #06101f;
+
+  /* Re-stepped for the dark surface, not flipped. */
+  --chart-1: #3b82f6;
+  --chart-2: #14b8a6;
+  --chart-3: #eab308;
+  --chart-4: #c084fc;
+  --chart-grid: #1b2536;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-grid: var(--chart-grid);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Large numerals (KPI values) read better with tighter tracking. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

@@ -1,0 +1,88 @@
+# Production-shaped stack (gunicorn + Next standalone), runnable locally:
+#
+#   docker compose -f docker-compose.prod.yml up --build
+#
+# It is deliberately *not* production-ready deployment config -- there is no TLS
+# terminator here, and secrets come from the shell rather than a secret manager.
+# What it does prove is that the production images build and boot correctly.
+
+# Distinct project name so this stack has its own network and volumes, and
+# `down -v` here cannot tear down the development stack.
+name: school-admin-erp-prod
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: erp_db_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-erp}
+      POSTGRES_USER: ${POSTGRES_USER:-erp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - erp_pgdata_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-erp} -d ${POSTGRES_DB:-erp}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./apps/api
+      target: prod
+    container_name: erp_api_prod
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+      # No defaults: prod.py refuses to boot without these.
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?set DJANGO_SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,.localhost,api}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      # Off by default here because nothing terminates TLS in this stack; with
+      # it on, every request would 301 to an https port that is not listening.
+      DJANGO_SECURE_SSL_REDIRECT: "False"
+      # The frontend proxies /api, so the tenant comes from the forwarded host.
+      DJANGO_USE_X_FORWARDED_HOST: "True"
+      # No TLS in this local stack, so the cookie cannot be Secure-only.
+      # A real deployment must leave this unset (prod.py forces it on).
+      AUTH_COOKIE_SECURE: "False"
+      DATABASE_URL: postgres://${POSTGRES_USER:-erp}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-erp}
+      DATABASE_HOST: db
+      POSTGRES_USER: ${POSTGRES_USER:-erp}
+      POSTGRES_DB: ${POSTGRES_DB:-erp}
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:-localhost}
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/api/health/ >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      target: prod
+      args:
+        # Empty port => the browser calls the API on this app's own origin, and
+        # the rewrite below forwards it. That keeps the refresh cookie
+        # first-party, exactly as in the deployed setup.
+        NEXT_PUBLIC_API_PORT: ""
+        API_PROXY_TARGET: ${API_PROXY_TARGET:-http://api:8000}
+    container_name: erp_web_prod
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+
+volumes:
+  erp_pgdata_prod:

@@ -1,0 +1,240 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# A new push supersedes an in-flight run for the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '20'
+
+jobs:
+  # ---------------------------------------------------------------------------
+  backend:
+    name: Backend (ruff · checks · pytest)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: erp
+          POSTGRES_USER: erp
+          POSTGRES_PASSWORD: erp
+        ports:
+          - 5432:5432
+        # The job must not start querying before Postgres accepts connections.
+        options: >-
+          --health-cmd "pg_isready -U erp -d erp"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    defaults:
+      run:
+        working-directory: apps/api
+
+    env:
+      DATABASE_URL: postgres://erp:erp@localhost:5432/erp
+      DJANGO_SECRET_KEY: ci-only-not-a-secret-padded-to-32-bytes
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,.localhost
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: apps/api/requirements/*.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements/dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Format check
+        run: ruff format --check .
+
+      - name: Django system checks
+        run: python manage.py check --settings=config.settings.test
+
+      - name: Fail on missing migrations
+        # Catches a model edited without a migration, which would otherwise only
+        # surface as a runtime error after deploy.
+        run: python manage.py makemigrations --check --dry-run --settings=config.settings.test
+
+      - name: Tests
+        # Creating a tenant runs the whole tenant migration set, so the schemas
+        # are built once per session; --create-db keeps CI from reusing state.
+        run: pytest -q --create-db
+
+  # ---------------------------------------------------------------------------
+  frontend:
+    name: Frontend (typecheck · lint · build)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck the generated API contract
+        run: pnpm --filter @erp/api-types typecheck
+
+      - name: Typecheck the web app
+        run: pnpm --filter @erp/web typecheck
+
+      - name: Lint
+        run: pnpm --filter @erp/web lint
+
+      - name: Production build
+        run: pnpm --filter @erp/web build
+
+  # ---------------------------------------------------------------------------
+  contract:
+    name: OpenAPI contract is in sync
+    runs-on: ubuntu-latest
+    needs: [backend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: apps/api/requirements/*.txt
+
+      - name: Install dependencies
+        run: pip install -r apps/api/requirements/base.txt
+
+      - name: Regenerate the schemas
+        working-directory: apps/api
+        env:
+          DJANGO_SECRET_KEY: ci-only-not-a-secret-padded-to-32-bytes
+          DJANGO_ALLOWED_HOSTS: localhost
+        run: |
+          python manage.py spectacular --settings=config.settings.test \
+            --file ../../packages/api-types/openapi.yaml
+          python manage.py spectacular --settings=config.settings.test \
+            --urlconf config.urls_public \
+            --file ../../packages/api-types/openapi-public.yaml
+
+      - name: Fail if the committed schema is stale
+        # The frontend's types are generated from these files, so a serializer
+        # change that skips regeneration would silently ship wrong types.
+        run: |
+          if ! git diff --quiet -- packages/api-types; then
+            echo "::error::The committed OpenAPI schema is out of date."
+            echo "Run: pnpm --filter @erp/api run schema && pnpm --filter @erp/api-types run generate"
+            git diff -- packages/api-types
+            exit 1
+          fi
+
+  # ---------------------------------------------------------------------------
+  e2e:
+    name: End-to-end (Playwright vs the Docker stack)
+    runs-on: ubuntu-latest
+    needs: [frontend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and start the stack
+        run: docker compose up -d --build
+
+      - name: Wait for the API to report healthy
+        run: |
+          for _ in $(seq 1 60); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' erp_api 2>/dev/null || echo starting)
+            [ "$status" = "healthy" ] && exit 0
+            sleep 5
+          done
+          echo "::error::API never became healthy"
+          docker compose logs api
+          exit 1
+
+      - name: Provision a school with demo data
+        run: |
+          docker compose exec -T api python manage.py create_school \
+            --schema northfield --name "Northfield School" \
+            --admin-email admin@northfield.test --admin-password 'School!2026dev'
+          docker compose exec -T api python manage.py seed_demo --schema northfield
+
+      - name: Wait for the web app
+        run: |
+          for _ in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://northfield.localhost:3000/es/login || true)
+            [ "$code" = "200" ] && exit 0
+            sleep 5
+          done
+          echo "::error::Web app never served a page"
+          docker compose logs web
+          exit 1
+
+      - name: Install Playwright browser
+        run: pnpm --filter @erp/web exec playwright install --with-deps chromium
+
+      - name: Run the suite
+        # The frontend host selects the tenant, so the suite must be pointed at
+        # a school's hostname rather than plain localhost.
+        env:
+          E2E_BASE_URL: http://northfield.localhost:3000
+        run: pnpm --filter @erp/web run test:e2e
+
+      - name: Upload the report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            apps/web/playwright-report
+            apps/web/test-results
+          retention-days: 7
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+
+  # ---------------------------------------------------------------------------
+  production-images:
+    name: Production images build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the prod targets
+        # Only a build: it catches Dockerfile regressions (a missing build-time
+        # env var, a broken collectstatic) without needing a running database.
+        env:
+          DJANGO_SECRET_KEY: ci-only-not-a-secret-padded-to-32-bytes
+          POSTGRES_PASSWORD: ci-only
+        run: docker compose -f docker-compose.prod.yml build

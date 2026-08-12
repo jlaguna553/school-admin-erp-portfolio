@@ -1,0 +1,36 @@
+{
+  "name": "school-admin-erp",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.34.4",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "up": "docker compose up -d",
+    "up:build": "docker compose up -d --build",
+    "down": "docker compose down",
+    "logs": "docker compose logs -f",
+    "prod:up": "docker compose -f docker-compose.prod.yml up -d --build",
+    "prod:down": "docker compose -f docker-compose.prod.yml down",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "seed": "docker compose exec api python manage.py seed_demo --schema northfield",
+    "school": "docker compose exec api python manage.py create_school",
+    "test": "pnpm run test:api && pnpm run test:e2e",
+    "test:api": "docker compose exec -T api pytest -q",
+    "test:e2e": "pnpm --filter @erp/web run test:e2e",
+    "api:venv": "python3 -m venv apps/api/.venv && apps/api/.venv/bin/pip install -U pip -r apps/api/requirements/dev.txt",
+    "api:dev": "apps/api/.venv/bin/python apps/api/manage.py runserver 0.0.0.0:8000",
+    "api:migrate": "apps/api/.venv/bin/python apps/api/manage.py migrate_schemas",
+    "api:schema": "apps/api/.venv/bin/python apps/api/manage.py spectacular --color --file packages/api-types/openapi.yaml",
+    "types:generate": "pnpm --filter @erp/api-types generate"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3"
+  }
+}

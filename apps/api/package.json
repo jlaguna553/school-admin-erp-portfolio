@@ -1,0 +1,18 @@
+{
+  "name": "@erp/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Django REST API (driven through the local .venv; this manifest only exposes the app to Turborepo).",
+  "scripts": {
+    "dev": ".venv/bin/python manage.py runserver 0.0.0.0:8000",
+    "lint": ".venv/bin/ruff check .",
+    "format": ".venv/bin/ruff format .",
+    "typecheck": ".venv/bin/mypy .",
+    "test": ".venv/bin/pytest",
+    "migrate": ".venv/bin/python manage.py migrate_schemas",
+    "makemigrations": ".venv/bin/python manage.py makemigrations",
+    "schema": ".venv/bin/python manage.py spectacular --file ../../packages/api-types/openapi.yaml",
+    "translations:make": ".venv/bin/python manage.py makemessages -l es -l en",
+    "translations:compile": ".venv/bin/python manage.py compilemessages"
+  }
+}

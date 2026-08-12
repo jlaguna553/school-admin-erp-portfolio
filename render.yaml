@@ -1,0 +1,111 @@
+# Render Blueprint — the API and its database.
+#
+# The frontend is deployed separately on Vercel and proxies /api here; see
+# docs/deployment.md. Only the API needs a long-running container: django-tenants
+# selects the school with a session-level `SET search_path`, which is not
+# something a serverless function model handles well.
+#
+#   render.com > New > Blueprint > point at this repo
+#
+# Everything marked `sync: false` must be filled in from the dashboard, because
+# it depends on the Vercel hostname that does not exist until the frontend is
+# deployed.
+services:
+  - type: web
+    name: erp-api
+    runtime: docker
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: ./apps/api
+    # Builds the `prod` stage: gunicorn + WhiteNoise, no dev dependencies.
+    dockerCommand: bash /app/scripts/docker-entrypoint.sh gunicorn
+    plan: free
+    region: frankfurt
+    healthCheckPath: /api/health/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: erp-db
+          # The *direct* connection string. A transaction-mode pooler would
+          # break tenant isolation: `SET search_path` is session state, so
+          # consecutive statements could run against a different schema.
+          property: connectionString
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: erp-db
+          property: host
+      # The frontend proxies /api, so Django must trust the forwarded host to
+      # resolve the school. Safe here because Vercel is the only ingress.
+      - key: DJANGO_USE_X_FORWARDED_HOST
+        value: "True"
+      # Render terminates TLS in front of the container.
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: "True"
+      - key: AUTH_COOKIE_SECURE
+        value: "True"
+      # Free plan runs a single instance, so migrating on boot is safe. Set this
+      # to false and use a pre-deploy step once there is more than one.
+      - key: RUN_MIGRATIONS_ON_START
+        value: "true"
+      # One worker keeps the free instance within its memory budget, and means
+      # the in-memory throttle counters are not multiplied. Add REDIS_URL before
+      # raising this.
+      - key: GUNICORN_WORKERS
+        value: "1"
+      # --- add these in the dashboard once the frontend URL exists ---
+      # `sync: false` means Render does NOT create the key: add each one by hand
+      # under Environment > Add Environment Variable.
+      #
+      # Must include the frontend's hostname (it arrives as X-Forwarded-Host and
+      # is validated against this list) and this service's own hostname.
+      #   e.g. my-app.vercel.app,erp-api-xxxx.onrender.com
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false
+      # Needed for the Django admin to accept POSTs through the proxy.
+      #   e.g. https://my-app.vercel.app
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      # The domain of the *public* tenant, which must be THIS service's hostname
+      # -- the health check below requests it, and a host with no Domain row
+      # resolves to no tenant and 404s, leaving the deploy stuck forever.
+      # The frontend's hostname belongs to the school, not to public.
+      #   e.g. erp-api-xxxx.onrender.com
+      - key: PUBLIC_DOMAIN
+        sync: false
+
+      # --- demo tenant, provisioned on boot ---
+      # Free plans have no shell, so the school is created from configuration
+      # instead. provision_demo is idempotent and re-points the domain if an
+      # earlier boot left it attached to the public tenant.
+      #   DEMO_SCHOOL_SCHEMA gates the whole thing: unset, nothing is created.
+      #   There is no hostname here -- one domain serves every school, and which
+      #   one you are in is decided by signing in.
+      - key: DEMO_SCHOOL_SCHEMA
+        value: demo
+      - key: DEMO_SCHOOL_NAME
+        value: Demo School
+      # The platform operator. Without these no account can reach the operator
+      # console or the Django admin, because a free host has no shell to run
+      # `createsuperuser` on. Its host is this service's own -- PUBLIC_DOMAIN --
+      # not the frontend's, which belongs to a school.
+      - key: PLATFORM_ADMIN_EMAIL
+        sync: false
+      - key: PLATFORM_ADMIN_PASSWORD
+        sync: false
+      - key: DEMO_ADMIN_EMAIL
+        sync: false
+      # Leave unset to have one generated and printed once in the deploy log.
+      - key: DEMO_ADMIN_PASSWORD
+        sync: false
+      - key: DEMO_SEED
+        value: "true"
+
+
+databases:
+  - name: erp-db
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: "16"
